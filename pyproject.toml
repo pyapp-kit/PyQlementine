@@ -1,0 +1,176 @@
+# Specify the build system.
+[build-system]
+requires = ["sip >=6,<7", "PyQt-builder >=1.17,<2", "PyQt6==6.5.3", "ruff"]
+build-backend = "sipbuild.api"
+
+# Specify the PEP 566 metadata for the project.
+[project]
+name = "PyQt6Ads"
+# TODO: make dynamic in project.py
+version = "4.5.0"
+requires-python = ">=3.9"
+description = "Python bindings for Qt Advanced Docking System"
+license = { text = "LGPL v2.1" }
+readme = "README.md"
+dependencies = ["PyQt6>=6.5.3,!=6.6"]
+classifiers = [
+	"Development Status :: 5 - Production/Stable",
+	"Intended Audience :: Developers",
+	"License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
+	"Operating System :: MacOS",
+	"Operating System :: Microsoft :: Windows",
+	"Operating System :: POSIX :: Linux",
+	"Programming Language :: Python :: 3",
+	"Topic :: Software Development :: Libraries :: Python Modules",
+	"Topic :: Software Development :: Widget Sets",
+	"Environment :: X11 Applications :: Qt",
+	"Typing :: Typed",
+]
+
+[project.urls]
+Upstream = "https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/"
+Homepage = "https://github.com/pyapp-kit/PyQt6Ads"
+
+[dependency-groups]
+build = ["sip >=6,<7", "PyQt-builder >=1.17,<2", "PyQt6==6.5.3", "PyQt6-Qt6==6.5.3"]
+test = ["pytest>=8.3.4"]
+dev = [
+	{ "include-group" = "build" },
+	{ "include-group" = "test" },
+	"ruff>=0.9.8",
+	"aqtinstall>=3.2.0",
+	"prek>=0.3.1",
+]
+
+[tool.sip.builder]
+jobs = 8
+
+[tool.sip.bindings.PyQt6Ads]
+pep484-pyi = true
+sip-file = "PyQt6Ads.sip"
+qmake-QT = ["widgets", "gui-private; platform_system == 'Linux'"]
+define-macros = ["ADS_SHARED_EXPORT"]
+include-dirs = [
+	"Qt-Advanced-Docking-System/src",
+	"Qt-Advanced-Docking-System/src/linux; platform_system == 'Linux'",
+]
+headers = [
+	"Qt-Advanced-Docking-System/src/AutoHideDockContainer.h",
+	"Qt-Advanced-Docking-System/src/AutoHideSideBar.h",
+	"Qt-Advanced-Docking-System/src/AutoHideTab.h",
+	"Qt-Advanced-Docking-System/src/DockAreaTabBar.h",
+	"Qt-Advanced-Docking-System/src/DockAreaTitleBar.h",
+	"Qt-Advanced-Docking-System/src/DockAreaTitleBar_p.h",
+	"Qt-Advanced-Docking-System/src/DockAreaWidget.h",
+	"Qt-Advanced-Docking-System/src/DockComponentsFactory.h",
+	"Qt-Advanced-Docking-System/src/DockContainerWidget.h",
+	"Qt-Advanced-Docking-System/src/DockFocusController.h",
+	"Qt-Advanced-Docking-System/src/DockManager.h",
+	"Qt-Advanced-Docking-System/src/DockOverlay.h",
+	"Qt-Advanced-Docking-System/src/DockSplitter.h",
+	"Qt-Advanced-Docking-System/src/DockWidget.h",
+	"Qt-Advanced-Docking-System/src/DockWidgetTab.h",
+	"Qt-Advanced-Docking-System/src/DockingStateReader.h",
+	"Qt-Advanced-Docking-System/src/ElidingLabel.h",
+	"Qt-Advanced-Docking-System/src/FloatingDockContainer.h",
+	"Qt-Advanced-Docking-System/src/FloatingDragPreview.h",
+	"Qt-Advanced-Docking-System/src/IconProvider.h",
+	"Qt-Advanced-Docking-System/src/PushButton.h",
+	"Qt-Advanced-Docking-System/src/ResizeHandle.h",
+	"Qt-Advanced-Docking-System/src/ads_globals.h",
+	"Qt-Advanced-Docking-System/src/linux/FloatingWidgetTitleBar.h; platform_system == 'Linux'",
+]
+sources = [
+	"Qt-Advanced-Docking-System/src/AutoHideTab.cpp",
+	"Qt-Advanced-Docking-System/src/AutoHideDockContainer.cpp",
+	"Qt-Advanced-Docking-System/src/AutoHideSideBar.cpp",
+	"Qt-Advanced-Docking-System/src/DockAreaTabBar.cpp",
+	"Qt-Advanced-Docking-System/src/DockAreaTitleBar.cpp",
+	"Qt-Advanced-Docking-System/src/DockAreaWidget.cpp",
+	"Qt-Advanced-Docking-System/src/DockComponentsFactory.cpp",
+	"Qt-Advanced-Docking-System/src/DockContainerWidget.cpp",
+	"Qt-Advanced-Docking-System/src/DockFocusController.cpp",
+	"Qt-Advanced-Docking-System/src/DockManager.cpp",
+	"Qt-Advanced-Docking-System/src/DockOverlay.cpp",
+	"Qt-Advanced-Docking-System/src/DockSplitter.cpp",
+	"Qt-Advanced-Docking-System/src/DockWidget.cpp",
+	"Qt-Advanced-Docking-System/src/DockWidgetTab.cpp",
+	"Qt-Advanced-Docking-System/src/DockingStateReader.cpp",
+	"Qt-Advanced-Docking-System/src/ElidingLabel.cpp",
+	"Qt-Advanced-Docking-System/src/FloatingDockContainer.cpp",
+	"Qt-Advanced-Docking-System/src/FloatingDragPreview.cpp",
+	"Qt-Advanced-Docking-System/src/IconProvider.cpp",
+	"Qt-Advanced-Docking-System/src/PushButton.cpp",
+	"Qt-Advanced-Docking-System/src/ResizeHandle.cpp",
+	"Qt-Advanced-Docking-System/src/ads_globals.cpp",
+	"Qt-Advanced-Docking-System/src/linux/FloatingWidgetTitleBar.cpp; platform_system == 'Linux'",
+]
+
+
+[tool.cibuildwheel]
+build-verbosity = 1
+build = [
+	"cp39-win_amd64",
+	"cp39-manylinux_x86_64",
+	"cp39-macosx_x86_64",
+	"cp39-macosx_arm64",
+]
+manylinux-x86_64-image = "manylinux_2_28"
+build-frontend = "build[uv]"
+test-command = "pytest {project}/tests -v"
+test-groups = ["test"]
+
+[tool.cibuildwheel.linux]
+environment-pass = ["QT_VERSION"]
+before-build = [
+	"yum install -y libxkbcommon-devel",
+	"uvx --from aqtinstall==3.2.0 aqt install-qt linux desktop $QT_VERSION --outputdir Qt --base http://mirrors.ocf.berkeley.edu/qt/",
+]
+repair-wheel-command = ["python scripts/repair_wheel.py {dest_dir} {wheel}"]
+test-command = [
+	"yum install -y epel-release",
+	"yum install -y libxkbcommon-x11 xcb-util-cursor xcb-util-wm xcb-util-keysyms xorg-x11-server-Xvfb",
+	"uv pip install pytest-xvfb",
+	"pytest {project}/tests -v",
+]
+
+[tool.cibuildwheel.macos]
+before-build = "uvx --from aqtinstall==3.2.0 aqt install-qt mac desktop $QT_VERSION --outputdir Qt --base http://mirrors.ocf.berkeley.edu/qt/"
+repair-wheel-command = ["python scripts/repair_wheel.py {dest_dir} {wheel}"]
+
+[tool.cibuildwheel.windows]
+before-build = "uvx --from aqtinstall==3.2.0 aqt install-qt windows desktop %QT_VERSION% win64_msvc2019_64 --outputdir Qt --base http://mirrors.ocf.berkeley.edu/qt/"
+
+
+# https://docs.astral.sh/ruff/
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+src = ["src", "tests"]
+fix = true
+unsafe-fixes = true
+
+[tool.ruff.lint]
+pydocstyle = { convention = "numpy" }
+select = [
+	"E",   # style errors
+	"F",   # flakes
+	"W",   # warnings
+	"I",   # isort
+	"UP",  # pyupgrade
+	"TC",  # flake8-typecheck
+	"TID", # flake8-tidy-imports
+	"RUF", # ruff-specific rules
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["RUF012"]
+
+# https://docs.astral.sh/ruff/formatter/
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.uv]
+# Packages are built and installed into the virtual environment in editable mode 
+# but sipbuild.api does not support editable installs.
+package = false
