@@ -2,37 +2,17 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import re
+import sys
+from dataclasses import asdict, dataclass, field
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    import PyQt6Qlementine
+    from PyQt6 import QtCore
     from typing_extensions import TypeAlias
 
-    # QSize accepts a tuple of 2 integers (width, height)
-    QSizeLike: TypeAlias = tuple[int, int]
-
-    # QColor accepts:
-    # a single integer (0xRRGGBB or 0xAARRGGBB)
-    #     however, because it's hard to disambiguate between 0x00RRGGBB and 0xRRGGBB
-    #     we will only accept 0xRRGGBB for the integer form, and you must use a tuple
-    #     for the 0xAARRGGBB form (e.g. (0xRR, 0xGG, 0xBB, 0xAA))
-    # a string (e.g. "#RRGGBB" or "#AARRGGBB" or an svg color name like "red")
-    # a tuple of 3 8-bit integers (R, G, B)
-    # a tuple of 4 8-bit integers (R, G, B, A)
-    QColorLike: TypeAlias = int | str | tuple[int, int, int] | tuple[int, int, int, int]
-
-    # QFont accepts:
-    FamilyOrFamilies: TypeAlias = str | list[str]
-    PointSize: TypeAlias = int
-    Weight: TypeAlias = int
-    Italic: TypeAlias = bool
-    QFontLike: TypeAlias = (
-        FamilyOrFamilies
-        | tuple[FamilyOrFamilies]
-        | tuple[FamilyOrFamilies, PointSize]
-        | tuple[FamilyOrFamilies, PointSize, Weight]
-        | tuple[FamilyOrFamilies, PointSize, Weight, Italic]
-    )
+    QColorLike: TypeAlias = str
 
 
 @dataclass
@@ -54,8 +34,6 @@ class Theme:
     background_color_main2: QColorLike = "#F3F3F3"
     background_color_main3: QColorLike = "#E3E3E3"
     background_color_main4: QColorLike = "#DCDCDC"
-    background_color_main_transparent: QColorLike = "#00FAFAFA"
-
     background_color_workspace: QColorLike = "#B7B7B7"
     background_color_tab_bar: QColorLike = "#B7B7B7"
 
@@ -63,7 +41,6 @@ class Theme:
     neutral_color_hovered: QColorLike = "#DADADA"
     neutral_color_pressed: QColorLike = "#D2D2D2"
     neutral_color_disabled: QColorLike = "#EEEEEE"
-    neutral_color_transparent: QColorLike = "#00E1E1E1"
 
     focus_color: QColorLike = "#6640A9FF"
 
@@ -71,37 +48,31 @@ class Theme:
     primary_color_hovered: QColorLike = "#2C9DFF"
     primary_color_pressed: QColorLike = "#40A9FF"
     primary_color_disabled: QColorLike = "#D1E9FF"
-    primary_color_transparent: QColorLike = "#001890FF"
 
     primary_color_foreground: QColorLike = "#FFFFFF"
     primary_color_foreground_hovered: QColorLike = "#FFFFFF"
     primary_color_foreground_pressed: QColorLike = "#FFFFFF"
     primary_color_foreground_disabled: QColorLike = "#ECF6FF"
-    primary_color_foreground_transparent: QColorLike = "#00FFFFFF"
 
     primary_alternative_color: QColorLike = "#106EF9"
     primary_alternative_color_hovered: QColorLike = "#107BFD"
     primary_alternative_color_pressed: QColorLike = "#108BFD"
     primary_alternative_color_disabled: QColorLike = "#A9D6FF"
-    primary_alternative_color_transparent: QColorLike = "#001875FF"
 
     secondary_color: QColorLike = "#404040"
     secondary_color_hovered: QColorLike = "#333333"
     secondary_color_pressed: QColorLike = "#262626"
     secondary_color_disabled: QColorLike = "#D4D4D4"
-    secondary_color_transparent: QColorLike = "#00404040"
 
     secondary_color_foreground: QColorLike = "#FFFFFF"
     secondary_color_foreground_hovered: QColorLike = "#FFFFFF"
     secondary_color_foreground_pressed: QColorLike = "#FFFFFF"
     secondary_color_foreground_disabled: QColorLike = "#EDEDED"
-    secondary_color_foreground_transparent: QColorLike = "#00FFFFFF"
 
     secondary_alternative_color: QColorLike = "#909090"
     secondary_alternative_color_hovered: QColorLike = "#747474"
     secondary_alternative_color_pressed: QColorLike = "#828282"
     secondary_alternative_color_disabled: QColorLike = "#C3C3C3"
-    secondary_alternative_color_transparent: QColorLike = "#00909090"
 
     status_color_success: QColorLike = "#2BB5A0"
     status_color_success_hovered: QColorLike = "#3CBFAB"
@@ -131,19 +102,16 @@ class Theme:
     shadow_color1: QColorLike = "#20000000"
     shadow_color2: QColorLike = "#40000000"
     shadow_color3: QColorLike = "#60000000"
-    shadow_color_transparent: QColorLike = "#00000000"
 
     border_color: QColorLike = "#D3D3D3"
     border_color_hovered: QColorLike = "#B3B3B3"
     border_color_pressed: QColorLike = "#A3A3A3"
     border_color_disabled: QColorLike = "#E9E9E9"
-    border_color_transparent: QColorLike = "#00D3D3D3"
 
     semi_transparent_color1: QColorLike = "#00000000"
     semi_transparent_color2: QColorLike = "#19000000"
     semi_transparent_color3: QColorLike = "#21000000"
     semi_transparent_color4: QColorLike = "#28000000"
-    semi_transparent_color_transparent: QColorLike = "#00000000"
 
     use_system_fonts: bool = False
 
@@ -179,10 +147,7 @@ class Theme:
 
     focus_border_width: int = 2
 
-    icon_size: QSizeLike = (16, 16)
-    icon_size_medium: QSizeLike = (24, 24)
-    icon_size_large: QSizeLike = (24, 24)
-    icon_size_extra_small: QSizeLike = (12, 12)
+    icon_extent: int = 16
 
     slider_tick_size: int = 3
     slider_tick_spacing: int = 2
@@ -200,14 +165,260 @@ class Theme:
     tab_bar_tab_max_width: int = 0
     tab_bar_tab_min_width: int = 0
 
-    font_regular: QFontLike | None = None
-    font_bold: QFontLike | None = None
-    font_h1: QFontLike | None = None
-    font_h2: QFontLike | None = None
-    font_h3: QFontLike | None = None
-    font_h4: QFontLike | None = None
-    font_h5: QFontLike | None = None
-    font_caption: QFontLike | None = None
-    font_monospace: QFontLike | None = None
+    def toJsonDoc(self) -> QtCore.QJsonDocument:
+        theme_dict = _to_camel_case_dict(asdict(self))
+        return _qt_core().QJsonDocument.fromVariant(theme_dict)
 
-    palette: Any = None  # TODO: QPalette
+    def toQlementine(self) -> PyQt6Qlementine.Theme:
+        import PyQt6Qlementine
+
+        doc = self.toJsonDoc()
+        return PyQt6Qlementine.Theme.fromJsonDoc(doc)
+
+
+def _snake_to_camel(name: str) -> str:
+    """Convert snake_case to camelCase (e.g. 'font_size_h1' -> 'fontSizeH1')."""
+    return re.sub(r"_([a-zA-Z0-9])", lambda m: m.group(1).upper(), name)
+
+
+def _to_camel_case_dict(d: dict[str, Any]) -> dict[str, Any]:
+    """Recursively convert all dict keys from snake_case to camelCase."""
+    out: dict[str, Any] = {}
+    for key, value in d.items():
+        camel_key = _snake_to_camel(key)
+        if isinstance(value, dict):
+            value = _to_camel_case_dict(value)
+        out[camel_key] = value
+    return out
+
+
+# ─── Radix Themes (Indigo accent / Slate gray) ──────────────────────
+#
+# Colors derived from Radix UI color scales:
+#   Slate:  1-12 step neutral gray with slight blue tint
+#   Indigo: 1-12 step blue-purple accent
+#   Red/Green/Amber/Cyan: status colors from Radix scales
+
+RADIX_INDIGO_LIGHT = Theme(
+    meta=ThemeMeta(name="Radix Indigo Light", author="Radix UI"),
+    # Backgrounds: slate-1 through slate-4, slate-8 for workspace/tabbar
+    background_color_main1="#FCFCFD",  # slate-1
+    background_color_main2="#F9F9FB",  # slate-2
+    background_color_main3="#F0F0F3",  # slate-3
+    background_color_main4="#E8E8EC",  # slate-4
+    background_color_workspace="#B9BBC6",  # slate-8
+    background_color_tab_bar="#B9BBC6",  # slate-8
+    # Neutrals: slate-4/5/6/3
+    neutral_color="#E8E8EC",  # slate-4
+    neutral_color_hovered="#E0E1E6",  # slate-5
+    neutral_color_pressed="#D9D9E0",  # slate-6
+    neutral_color_disabled="#F0F0F3",  # slate-3
+    # Focus: indigo-7 @ ~40% alpha
+    focus_color="#66ABBDF9",
+    # Primary: indigo-9/10/11, indigo-6 disabled
+    primary_color="#3E63DD",  # indigo-9
+    primary_color_hovered="#3358D4",  # indigo-10
+    primary_color_pressed="#3A5BC7",  # indigo-11
+    primary_color_disabled="#C1D0FF",  # indigo-6
+    primary_color_foreground="#FFFFFF",
+    primary_color_foreground_hovered="#FFFFFF",
+    primary_color_foreground_pressed="#FFFFFF",
+    primary_color_foreground_disabled="#E1E9FF",  # indigo-4
+    # Primary alternative: deeper indigo shades
+    primary_alternative_color="#3358D4",  # indigo-10
+    primary_alternative_color_hovered="#3A5BC7",  # indigo-11
+    primary_alternative_color_pressed="#1F2D5C",  # indigo-12
+    primary_alternative_color_disabled="#D2DEFF",  # indigo-5
+    # Secondary: slate-12/11/10, slate-8 disabled
+    secondary_color="#1C2024",  # slate-12
+    secondary_color_hovered="#60646C",  # slate-11
+    secondary_color_pressed="#80838D",  # slate-10
+    secondary_color_disabled="#B9BBC6",  # slate-8
+    secondary_color_foreground="#FFFFFF",
+    secondary_color_foreground_hovered="#FFFFFF",
+    secondary_color_foreground_pressed="#FFFFFF",
+    secondary_color_foreground_disabled="#E8E8EC",  # slate-4
+    # Secondary alternative: slate mid-range
+    secondary_alternative_color="#8B8D98",  # slate-9
+    secondary_alternative_color_hovered="#80838D",  # slate-10
+    secondary_alternative_color_pressed="#60646C",  # slate-11
+    secondary_alternative_color_disabled="#CDCED6",  # slate-7
+    # Status: Radix green, cyan, amber, red (light scales)
+    status_color_success="#30A46C",  # green-9
+    status_color_success_hovered="#2B9A66",  # green-10
+    status_color_success_pressed="#218358",  # green-11
+    status_color_success_disabled="#D6F1DF",  # green-4
+    status_color_info="#00A2C7",  # cyan-9
+    status_color_info_hovered="#0797B9",  # cyan-10
+    status_color_info_pressed="#107D98",  # cyan-11
+    status_color_info_disabled="#C7EAF5",  # cyan-4
+    status_color_warning="#FFC53D",  # amber-9
+    status_color_warning_hovered="#FFBA18",  # amber-10
+    status_color_warning_pressed="#AB6400",  # amber-11
+    status_color_warning_disabled="#FEEFD8",  # amber-4
+    status_color_error="#E5484D",  # red-9
+    status_color_error_hovered="#DC3E42",  # red-10
+    status_color_error_pressed="#CE2C31",  # red-11
+    status_color_error_disabled="#FFDCD9",  # red-4
+    status_color_foreground="#FFFFFF",
+    status_color_foreground_hovered="#FFFFFF",
+    status_color_foreground_pressed="#FFFFFF",
+    status_color_foreground_disabled="#99FFFFFF",
+    # Shadows
+    shadow_color1="#20000000",
+    shadow_color2="#40000000",
+    shadow_color3="#60000000",
+    # Borders: slate-6/7/8/5
+    border_color="#D9D9E0",  # slate-6
+    border_color_hovered="#CDCED6",  # slate-7
+    border_color_pressed="#B9BBC6",  # slate-8
+    border_color_disabled="#E0E1E6",  # slate-5
+    # Semi-transparent overlays
+    semi_transparent_color1="#00000000",
+    semi_transparent_color2="#19000000",
+    semi_transparent_color3="#21000000",
+    semi_transparent_color4="#28000000",
+    # Radii: Radix default = 6px medium
+    border_radius=6.0,
+    check_box_border_radius=4.0,
+    menu_item_border_radius=4.0,
+    menu_bar_item_border_radius=2.0,
+)
+
+RADIX_INDIGO_DARK = Theme(
+    meta=ThemeMeta(name="Radix Indigo Dark", author="Radix UI"),
+    # Backgrounds: dark slate-1 through slate-4, slate-8 for workspace/tabbar
+    background_color_main1="#111113",  # slate-1
+    background_color_main2="#18191B",  # slate-2
+    background_color_main3="#212225",  # slate-3
+    background_color_main4="#272A2D",  # slate-4
+    background_color_workspace="#2E3135",  # slate-5
+    background_color_tab_bar="#2E3135",  # slate-5
+    # Neutrals: slate-4/5/6/3
+    neutral_color="#272A2D",  # slate-4
+    neutral_color_hovered="#2E3135",  # slate-5
+    neutral_color_pressed="#363A3F",  # slate-6
+    neutral_color_disabled="#212225",  # slate-3
+    # Focus: indigo-7 @ ~40% alpha
+    focus_color="#663A4F97",
+    # Primary: indigo-9/10/11, indigo-5 disabled
+    primary_color="#3E63DD",  # indigo-9
+    primary_color_hovered="#5472E4",  # indigo-10
+    primary_color_pressed="#849DFF",  # indigo-11
+    primary_color_disabled="#253974",  # indigo-5
+    primary_color_foreground="#FFFFFF",
+    primary_color_foreground_hovered="#FFFFFF",
+    primary_color_foreground_pressed="#FFFFFF",
+    primary_color_foreground_disabled="#43484E",  # slate-7
+    # Primary alternative: indigo deeper/lighter shades
+    primary_alternative_color="#435DB1",  # indigo-8
+    primary_alternative_color_hovered="#3A4F97",  # indigo-7
+    primary_alternative_color_pressed="#304384",  # indigo-6
+    primary_alternative_color_disabled="#1D2E62",  # indigo-4
+    # Secondary: slate-12/11/10, slate-7 disabled
+    secondary_color="#EDEEF0",  # slate-12
+    secondary_color_hovered="#B0B4BA",  # slate-11
+    secondary_color_pressed="#777B84",  # slate-10
+    secondary_color_disabled="#5A6169",  # slate-8
+    secondary_color_foreground="#111113",  # slate-1
+    secondary_color_foreground_hovered="#111113",
+    secondary_color_foreground_pressed="#18191B",  # slate-2
+    secondary_color_foreground_disabled="#363A3F",  # slate-6
+    # Secondary alternative: slate mid-range
+    secondary_alternative_color="#696E77",  # slate-9
+    secondary_alternative_color_hovered="#777B84",  # slate-10
+    secondary_alternative_color_pressed="#B0B4BA",  # slate-11
+    secondary_alternative_color_disabled="#43484E",  # slate-7
+    # Status: Radix dark-mode scales
+    status_color_success="#30A46C",  # green-9
+    status_color_success_hovered="#3CB179",  # green-10
+    status_color_success_pressed="#4CC38A",  # green-11
+    status_color_success_disabled="#1B3A2D",  # green-4 (dark)
+    status_color_info="#00A2C7",  # cyan-9
+    status_color_info_hovered="#23AFD0",  # cyan-10
+    status_color_info_pressed="#4CCCE6",  # cyan-11
+    status_color_info_disabled="#142D37",  # cyan-4 (dark)
+    status_color_warning="#FFC53D",  # amber-9
+    status_color_warning_hovered="#FFD60A",  # amber-10
+    status_color_warning_pressed="#FFCA16",  # amber-11
+    status_color_warning_disabled="#3F2200",  # amber-4 (dark)
+    status_color_error="#E5484D",  # red-9
+    status_color_error_hovered="#EC5D5E",  # red-10
+    status_color_error_pressed="#FF9592",  # red-11
+    status_color_error_disabled="#3C1618",  # red-4 (dark)
+    status_color_foreground="#FFFFFF",
+    status_color_foreground_hovered="#FFFFFF",
+    status_color_foreground_pressed="#FFFFFF",
+    status_color_foreground_disabled="#99FFFFFF",
+    # Shadows: stronger in dark mode
+    shadow_color1="#30000000",
+    shadow_color2="#50000000",
+    shadow_color3="#70000000",
+    # Borders: slate-6/7/8/5
+    border_color="#363A3F",  # slate-6
+    border_color_hovered="#43484E",  # slate-7
+    border_color_pressed="#5A6169",  # slate-8
+    border_color_disabled="#2E3135",  # slate-5
+    # Semi-transparent overlays (white-based for dark themes)
+    semi_transparent_color1="#00FFFFFF",
+    semi_transparent_color2="#19FFFFFF",
+    semi_transparent_color3="#21FFFFFF",
+    semi_transparent_color4="#28FFFFFF",
+    # Radii: same as light
+    border_radius=6.0,
+    check_box_border_radius=4.0,
+    menu_item_border_radius=4.0,
+    menu_bar_item_border_radius=2.0,
+)
+
+
+def _qt_core() -> Any:
+    for framework in {"PyQt6", "PySide6"}:
+        if framework in sys.modules:
+            mod = sys.modules[framework]
+            return mod.QtCore
+    for framework in {"PyQt6", "PySide6"}:
+        try:
+            mod = __import__(framework)
+            return mod.QtCore
+        except ImportError:
+            continue
+    raise ImportError("Neither PyQt6 nor PySide6 is installed.")
+
+
+if __name__ == "__main__":
+    from PyQt6 import QtWidgets
+    from PyQt6.QtCore import Qt
+    from PyQt6Qlementine import QlementineStyle
+
+    app = QtWidgets.QApplication([])
+
+    style = QlementineStyle(app)
+    app.setStyle(style)
+
+    theme = RADIX_INDIGO_DARK
+    style.setTheme(theme.toQlementine())
+
+    sample_widget = QtWidgets.QWidget()
+    sample_widget.setWindowTitle("Sample Widget")
+    layout = QtWidgets.QVBoxLayout(sample_widget)
+    button = QtWidgets.QPushButton("Sample Button")
+    layout.addWidget(button)
+    combo = QtWidgets.QComboBox()
+    combo.addItems(["Option 1", "Option 2", "Option 3"])
+    layout.addWidget(combo)
+    slider = QtWidgets.QSlider(Qt.Orientation.Horizontal)
+    layout.addWidget(slider)
+    check_box = QtWidgets.QCheckBox("Sample Check Box")
+    layout.addWidget(check_box)
+    int_spin = QtWidgets.QSpinBox()
+    layout.addWidget(int_spin)
+    float_spin = QtWidgets.QDoubleSpinBox()
+    layout.addWidget(float_spin)
+    dial = QtWidgets.QDial()
+    dial.setNotchesVisible(True)
+    layout.addWidget(dial)
+
+    sample_widget.resize(400, 300)
+    sample_widget.show()
+    app.exec()

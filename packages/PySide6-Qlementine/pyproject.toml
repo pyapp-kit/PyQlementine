@@ -11,7 +11,8 @@ name = "PySide6-Qlementine"
 version = "1.4.2"
 requires-python = ">=3.10"
 description = "PySide6 bindings for Qlementine, a modern QStyle for desktop Qt6 applications"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 readme = "../../README.md"
 dependencies = ["PySide6>=6.10"]
 classifiers = [

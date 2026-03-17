@@ -7,13 +7,14 @@ name = "PyQt6-Qlementine"
 version = "1.4.2"
 requires-python = ">=3.10"
 description = "Python bindings for Qlementine, a modern QStyle for desktop Qt6 applications"
-license = { text = "MIT" }
+license = "GPL-3.0-only"
+license-files = ["LICENSE"]
 readme = "../../README.md"
 dependencies = ["PyQt6>=6.8.0"]
 classifiers = [
 	"Development Status :: 3 - Alpha",
 	"Intended Audience :: Developers",
-	"License :: OSI Approved :: MIT License",
+	"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 	"Operating System :: MacOS",
 	"Operating System :: Microsoft :: Windows",
 	"Operating System :: POSIX :: Linux",
