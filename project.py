@@ -11,23 +11,23 @@ class _Builder(QmakeBuilder):
     # not using Project.dunder_init... since that seems to affect PyQt6.__init__
     def install_project(self, target_dir, *, wheel_tag=None):
         super().install_project(target_dir, wheel_tag=wheel_tag)
-        package = Path(target_dir, "PyQt6Ads")
+        package = Path(target_dir, "PyQt6Qlementine")
         if os.name != "nt":
-            contents = "from ._ads import *\n"
+            contents = "from ._qlementine import *\n"
         else:
-            contents = """
+            contents = """\
 try:
     import PyQt6  # force addition of Qt6/bin to dll_directories
 except ImportError:
-    raise ImportError("PyQt6 must be installed in order to use PyQt6Ads.") from None
+    raise ImportError("PyQt6 must be installed in order to use PyQt6Qlementine.") from None
 
-from ._ads import *
+from ._qlementine import *
 del PyQt6
-            """
+"""
         (package / "__init__.py").write_text(contents)
 
-        # rename _ads.pyi to __init__.pyi
-        stubs = package / "_ads.pyi"
+        # rename _qlementine.pyi to __init__.pyi
+        stubs = package / "_qlementine.pyi"
         stubs = stubs.rename(package / "__init__.pyi")
 
         # fix some errors in the stubs
@@ -50,11 +50,11 @@ del PyQt6
         (package / "py.typed").touch()
 
 
-class PyQt6Ads(PyQtProject):
+class PyQt6Qlementine(PyQtProject):
     def __init__(self):
         super().__init__()
         self.builder_factory = _Builder
-        self.bindings_factories = [PyQt6Adsmod]
+        self.bindings_factories = [PyQt6Qlementinemod]
         self.verbose = bool(os.getenv("CI") or os.getenv("CIBUILDWHEEL"))
 
     def apply_user_defaults(self, tool):
@@ -81,13 +81,25 @@ class PyQt6Ads(PyQtProject):
         return super().build_wheel(wheel_directory)
 
 
-class PyQt6Adsmod(PyQtBindings):
+class PyQt6Qlementinemod(PyQtBindings):
     def __init__(self, project):
-        super().__init__(project, "PyQt6Ads")
+        super().__init__(project, "PyQt6Qlementine")
 
     def apply_user_defaults(self, tool):
-        resource_file = os.path.join(
-            self.project.root_dir, "Qt-Advanced-Docking-System", "src", "ads.qrc"
+        root = self.project.root_dir
+        # add Qt resource files
+        for qrc in [
+            "qlementine/lib/resources/qlementine.qrc",
+            "qlementine/lib/resources/qlementine_font_inter.qrc",
+            "qlementine/lib/resources/qlementine_font_roboto.qrc",
+        ]:
+            resource_file = os.path.join(root, qrc)
+            self.builder_settings.append("RESOURCES += " + resource_file)
+
+        # enable C++17 and suppress -Werror from qlementine headers
+        self.builder_settings.append("CONFIG += c++17")
+        self.builder_settings.append(
+            "QMAKE_CXXFLAGS += -std=c++17 -Wno-error -Wno-overloaded-virtual"
         )
-        self.builder_settings.append("RESOURCES += " + resource_file)
+
         super().apply_user_defaults(tool)

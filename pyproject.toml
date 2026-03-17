@@ -5,18 +5,17 @@ build-backend = "sipbuild.api"
 
 # Specify the PEP 566 metadata for the project.
 [project]
-name = "PyQt6Ads"
-# TODO: make dynamic in project.py
-version = "4.5.0"
+name = "PyQt6Qlementine"
+version = "1.4.2"
 requires-python = ">=3.9"
-description = "Python bindings for Qt Advanced Docking System"
-license = { text = "LGPL v2.1" }
+description = "Python bindings for Qlementine, a modern QStyle for desktop Qt6 applications"
+license = { text = "MIT" }
 readme = "README.md"
 dependencies = ["PyQt6>=6.5.3,!=6.6"]
 classifiers = [
-	"Development Status :: 5 - Production/Stable",
+	"Development Status :: 3 - Alpha",
 	"Intended Audience :: Developers",
-	"License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
+	"License :: OSI Approved :: MIT License",
 	"Operating System :: MacOS",
 	"Operating System :: Microsoft :: Windows",
 	"Operating System :: POSIX :: Linux",
@@ -28,8 +27,8 @@ classifiers = [
 ]
 
 [project.urls]
-Upstream = "https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/"
-Homepage = "https://github.com/pyapp-kit/PyQt6Ads"
+Upstream = "https://github.com/oclero/qlementine"
+Homepage = "https://github.com/pyapp-kit/PyQt6Qlementine"
 
 [dependency-groups]
 build = ["sip >=6,<7", "PyQt-builder >=1.17,<2", "PyQt6==6.5.3", "PyQt6-Qt6==6.5.3"]
@@ -45,65 +44,92 @@ dev = [
 [tool.sip.builder]
 jobs = 8
 
-[tool.sip.bindings.PyQt6Ads]
+[tool.sip.bindings.PyQt6Qlementine]
 pep484-pyi = true
-sip-file = "PyQt6Ads.sip"
-qmake-QT = ["widgets", "gui-private; platform_system == 'Linux'"]
-define-macros = ["ADS_SHARED_EXPORT"]
+sip-file = "PyQt6Qlementine.sip"
+qmake-QT = ["widgets", "svg"]
 include-dirs = [
-	"Qt-Advanced-Docking-System/src",
-	"Qt-Advanced-Docking-System/src/linux; platform_system == 'Linux'",
+	"qlementine/lib/include",
+	"qlementine/lib/src",
 ]
 headers = [
-	"Qt-Advanced-Docking-System/src/AutoHideDockContainer.h",
-	"Qt-Advanced-Docking-System/src/AutoHideSideBar.h",
-	"Qt-Advanced-Docking-System/src/AutoHideTab.h",
-	"Qt-Advanced-Docking-System/src/DockAreaTabBar.h",
-	"Qt-Advanced-Docking-System/src/DockAreaTitleBar.h",
-	"Qt-Advanced-Docking-System/src/DockAreaTitleBar_p.h",
-	"Qt-Advanced-Docking-System/src/DockAreaWidget.h",
-	"Qt-Advanced-Docking-System/src/DockComponentsFactory.h",
-	"Qt-Advanced-Docking-System/src/DockContainerWidget.h",
-	"Qt-Advanced-Docking-System/src/DockFocusController.h",
-	"Qt-Advanced-Docking-System/src/DockManager.h",
-	"Qt-Advanced-Docking-System/src/DockOverlay.h",
-	"Qt-Advanced-Docking-System/src/DockSplitter.h",
-	"Qt-Advanced-Docking-System/src/DockWidget.h",
-	"Qt-Advanced-Docking-System/src/DockWidgetTab.h",
-	"Qt-Advanced-Docking-System/src/DockingStateReader.h",
-	"Qt-Advanced-Docking-System/src/ElidingLabel.h",
-	"Qt-Advanced-Docking-System/src/FloatingDockContainer.h",
-	"Qt-Advanced-Docking-System/src/FloatingDragPreview.h",
-	"Qt-Advanced-Docking-System/src/IconProvider.h",
-	"Qt-Advanced-Docking-System/src/PushButton.h",
-	"Qt-Advanced-Docking-System/src/ResizeHandle.h",
-	"Qt-Advanced-Docking-System/src/ads_globals.h",
-	"Qt-Advanced-Docking-System/src/linux/FloatingWidgetTitleBar.h; platform_system == 'Linux'",
+	"qlementine/lib/include/oclero/qlementine/Common.hpp",
+	"qlementine/lib/include/oclero/qlementine/animation/WidgetAnimationManager.hpp",
+	"qlementine/lib/include/oclero/qlementine/animation/WidgetAnimator.hpp",
+	"qlementine/lib/include/oclero/qlementine/style/Delegates.hpp",
+	"qlementine/lib/include/oclero/qlementine/style/QlementineStyle.hpp",
+	"qlementine/lib/include/oclero/qlementine/style/QlementineStyleOption.hpp",
+	"qlementine/lib/include/oclero/qlementine/style/Theme.hpp",
+	"qlementine/lib/include/oclero/qlementine/style/ThemeManager.hpp",
+	"qlementine/lib/include/oclero/qlementine/tools/ThemeEditor.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/AboutDialog.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/AbstractItemListWidget.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/Action.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/ActionButton.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/ColorButton.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/ColorEditor.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/CommandLinkButton.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/Expander.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/IconWidget.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/Label.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/LineEdit.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/LoadingSpinner.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/Menu.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/NavigationBar.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/NotificationBadge.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/PlainTextEdit.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/Popover.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/PopoverButton.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/RoundedFocusFrame.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/SegmentedControl.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/StatusBadgeWidget.hpp",
+	"qlementine/lib/include/oclero/qlementine/widgets/Switch.hpp",
 ]
 sources = [
-	"Qt-Advanced-Docking-System/src/AutoHideTab.cpp",
-	"Qt-Advanced-Docking-System/src/AutoHideDockContainer.cpp",
-	"Qt-Advanced-Docking-System/src/AutoHideSideBar.cpp",
-	"Qt-Advanced-Docking-System/src/DockAreaTabBar.cpp",
-	"Qt-Advanced-Docking-System/src/DockAreaTitleBar.cpp",
-	"Qt-Advanced-Docking-System/src/DockAreaWidget.cpp",
-	"Qt-Advanced-Docking-System/src/DockComponentsFactory.cpp",
-	"Qt-Advanced-Docking-System/src/DockContainerWidget.cpp",
-	"Qt-Advanced-Docking-System/src/DockFocusController.cpp",
-	"Qt-Advanced-Docking-System/src/DockManager.cpp",
-	"Qt-Advanced-Docking-System/src/DockOverlay.cpp",
-	"Qt-Advanced-Docking-System/src/DockSplitter.cpp",
-	"Qt-Advanced-Docking-System/src/DockWidget.cpp",
-	"Qt-Advanced-Docking-System/src/DockWidgetTab.cpp",
-	"Qt-Advanced-Docking-System/src/DockingStateReader.cpp",
-	"Qt-Advanced-Docking-System/src/ElidingLabel.cpp",
-	"Qt-Advanced-Docking-System/src/FloatingDockContainer.cpp",
-	"Qt-Advanced-Docking-System/src/FloatingDragPreview.cpp",
-	"Qt-Advanced-Docking-System/src/IconProvider.cpp",
-	"Qt-Advanced-Docking-System/src/PushButton.cpp",
-	"Qt-Advanced-Docking-System/src/ResizeHandle.cpp",
-	"Qt-Advanced-Docking-System/src/ads_globals.cpp",
-	"Qt-Advanced-Docking-System/src/linux/FloatingWidgetTitleBar.cpp; platform_system == 'Linux'",
+	"qlementine/lib/src/animation/WidgetAnimationManager.cpp",
+	"qlementine/lib/src/animation/WidgetAnimator.cpp",
+	"qlementine/lib/src/resources/ResourceInitialization.cpp",
+	"qlementine/lib/src/style/Delegates.cpp",
+	"src/EventFilters_wrapper.cpp",
+	"qlementine/lib/src/style/QlementineStyle.cpp",
+	"qlementine/lib/src/style/Theme.cpp",
+	"qlementine/lib/src/style/ThemeManager.cpp",
+	"qlementine/lib/src/tools/ThemeEditor.cpp",
+	"qlementine/lib/src/utils/BadgeUtils.cpp",
+	"qlementine/lib/src/utils/ColorUtils.cpp",
+	"qlementine/lib/src/utils/FontUtils.cpp",
+	"qlementine/lib/src/utils/GeometryUtils.cpp",
+	"qlementine/lib/src/utils/IconUtils.cpp",
+	"qlementine/lib/src/utils/ImageUtils.cpp",
+	"qlementine/lib/src/utils/LayoutUtils.cpp",
+	"qlementine/lib/src/utils/MenuUtils.cpp",
+	"qlementine/lib/src/utils/PrimitiveUtils.cpp",
+	"qlementine/lib/src/utils/RadiusesF.cpp",
+	"qlementine/lib/src/utils/StateUtils.cpp",
+	"qlementine/lib/src/utils/StyleUtils.cpp",
+	"qlementine/lib/src/utils/WidgetUtils.cpp",
+	"qlementine/lib/src/widgets/AboutDialog.cpp",
+	"qlementine/lib/src/widgets/AbstractItemListWidget.cpp",
+	"qlementine/lib/src/widgets/Action.cpp",
+	"qlementine/lib/src/widgets/ActionButton.cpp",
+	"qlementine/lib/src/widgets/ColorButton.cpp",
+	"qlementine/lib/src/widgets/ColorEditor.cpp",
+	"qlementine/lib/src/widgets/CommandLinkButton.cpp",
+	"qlementine/lib/src/widgets/Expander.cpp",
+	"qlementine/lib/src/widgets/IconWidget.cpp",
+	"qlementine/lib/src/widgets/Label.cpp",
+	"qlementine/lib/src/widgets/LineEdit.cpp",
+	"qlementine/lib/src/widgets/LoadingSpinner.cpp",
+	"qlementine/lib/src/widgets/Menu.cpp",
+	"qlementine/lib/src/widgets/NavigationBar.cpp",
+	"qlementine/lib/src/widgets/NotificationBadge.cpp",
+	"qlementine/lib/src/widgets/PlainTextEdit.cpp",
+	"src/Popover_patched.cpp",
+	"qlementine/lib/src/widgets/PopoverButton.cpp",
+	"qlementine/lib/src/widgets/RoundedFocusFrame.cpp",
+	"qlementine/lib/src/widgets/SegmentedControl.cpp",
+	"qlementine/lib/src/widgets/StatusBadgeWidget.cpp",
+	"qlementine/lib/src/widgets/Switch.cpp",
 ]
 
 
@@ -171,6 +197,6 @@ select = [
 docstring-code-format = true
 
 [tool.uv]
-# Packages are built and installed into the virtual environment in editable mode 
+# Packages are built and installed into the virtual environment in editable mode
 # but sipbuild.api does not support editable installs.
 package = false

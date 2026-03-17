@@ -1,10 +1,10 @@
 """Delocate wheel file."""
 
 import re
-import sys
-from subprocess import run
-from pathlib import Path
 import shutil
+import sys
+from pathlib import Path
+from subprocess import run
 
 
 def main() -> None:
