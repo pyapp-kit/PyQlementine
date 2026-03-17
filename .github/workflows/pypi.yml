@@ -28,7 +28,7 @@ jobs:
           path: dist/*.tar.gz
 
   build-wheels:
-    name: ${{ matrix.os }} wheel
+    name: ${{ matrix.os }} ${{ matrix.package }}
     runs-on: ${{ matrix.os }}
     env:
       QT_VERSION: "6.8.0"  # used in cibuildwheel
