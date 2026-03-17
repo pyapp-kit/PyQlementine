@@ -25,7 +25,6 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-
 from PyQt6Qlementine import (
     ActionButton,
     AutoIconColor,
@@ -263,7 +262,10 @@ class DemoWindow(QMainWindow):
         scroll.setWidget(gallery)
 
         gallery_layout = QVBoxLayout(gallery)
-        gallery.setSizePolicy(gallery.sizePolicy().horizontalPolicy(), gallery.sizePolicy().verticalPolicy())
+        gallery.setSizePolicy(
+            gallery.sizePolicy().horizontalPolicy(),
+            gallery.sizePolicy().verticalPolicy(),
+        )
 
         _setup_labels(gallery_layout)
         _setup_buttons(gallery_layout)

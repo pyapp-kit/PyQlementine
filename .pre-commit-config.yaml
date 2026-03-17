@@ -5,18 +5,19 @@ ci:
 
 files: "examples|tests"
 repos:
-  - repo: https://github.com/crate-ci/typos
-    rev: v1
-    hooks:
-      - id: typos
-
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.4
-    hooks:
-      - id: ruff
-      - id: ruff-format
-
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.25
+    rev: v0.24.1
     hooks:
       - id: validate-pyproject
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.10
+    hooks:
+      - id: actionlint
+        args: ["-ignore", 'label ".+" is unknown']
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.14
+    hooks:
+      - id: ruff-check
+      - id: ruff-format

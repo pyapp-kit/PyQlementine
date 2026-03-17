@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from PyQt6.QtWidgets import QApplication
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from PyQt6.QtWidgets import QApplication
 
 
 def test_import():

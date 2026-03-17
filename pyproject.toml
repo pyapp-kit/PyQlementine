@@ -26,8 +26,7 @@ build = [
 manylinux-x86_64-image = "manylinux_2_28"
 build-frontend = "build[uv]"
 test-command = "pytest {project}/tests -v"
-test-groups = ["test"]
-package-dir = "packages/PyQt6-Qlementine"
+test-requires = ["pytest>=8.3.4"]
 
 [tool.cibuildwheel.linux]
 environment-pass = ["QT_VERSION"]
