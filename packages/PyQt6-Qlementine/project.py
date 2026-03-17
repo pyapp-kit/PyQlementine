@@ -2,6 +2,7 @@ import os
 import platform
 import re
 import shutil
+import sys
 from pathlib import Path
 
 from pyqtbuild import PyQtBindings, PyQtProject, QmakeBuilder
@@ -135,10 +136,13 @@ class PyQt6Qlementinemod(PyQtBindings):
             resource_file = os.path.join(repo_root, qrc)
             self.builder_settings.append("RESOURCES += " + resource_file)
 
-        # enable C++17 and suppress -Werror from qlementine headers
+        # enable C++17 and suppress warnings from qlementine headers
         self.builder_settings.append("CONFIG += c++17")
-        self.builder_settings.append(
-            "QMAKE_CXXFLAGS += -std=c++17 -Wno-error -Wno-overloaded-virtual"
-        )
+        if sys.platform == "win32":
+            self.builder_settings.append("QMAKE_CXXFLAGS += /std:c++17 /W0")
+        else:
+            self.builder_settings.append(
+                "QMAKE_CXXFLAGS += -std=c++17 -Wno-error -Wno-overloaded-virtual"
+            )
 
         super().apply_user_defaults(tool)

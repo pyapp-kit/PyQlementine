@@ -45,7 +45,7 @@ test-requires = ["pytest>=8.3.4"]
 [tool.cibuildwheel.linux]
 environment-pass = ["QT_VERSION"]
 before-build = [
-	"yum install -y libxkbcommon-devel",
+	"yum install -y libxkbcommon-devel libxslt",
 	"uvx --from aqtinstall==3.2.0 aqt install-qt linux desktop $QT_VERSION --outputdir Qt --base http://mirrors.ocf.berkeley.edu/qt/",
 ]
 repair-wheel-command = ["python scripts/repair_wheel.py {dest_dir} {wheel}"]

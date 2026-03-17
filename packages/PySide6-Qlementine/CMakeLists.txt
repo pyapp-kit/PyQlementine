@@ -145,7 +145,11 @@ target_include_directories(qlementine_static
     PRIVATE ${QLEMENTINE_PRIVATE_INCLUDE}
 )
 target_link_libraries(qlementine_static PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Svg)
-target_compile_options(qlementine_static PRIVATE -Wno-error -Wno-overloaded-virtual)
+if(MSVC)
+    target_compile_options(qlementine_static PRIVATE /W0)
+else()
+    target_compile_options(qlementine_static PRIVATE -Wno-error -Wno-overloaded-virtual)
+endif()
 
 # ---- Generate PySide6 bindings via Shiboken6Tools ----
 find_package(Shiboken6Tools REQUIRED)
