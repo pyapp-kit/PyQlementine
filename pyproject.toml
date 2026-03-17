@@ -5,7 +5,7 @@ build-backend = "sipbuild.api"
 
 # Specify the PEP 566 metadata for the project.
 [project]
-name = "PyQt6Qlementine"
+name = "PyQt6-Qlementine"
 version = "1.4.2"
 requires-python = ">=3.10"
 description = "Python bindings for Qlementine, a modern QStyle for desktop Qt6 applications"
@@ -28,7 +28,7 @@ classifiers = [
 
 [project.urls]
 Upstream = "https://github.com/oclero/qlementine"
-Homepage = "https://github.com/pyapp-kit/PyQt6Qlementine"
+Homepage = "https://github.com/pyapp-kit/PyQt6-Qlementine"
 
 [dependency-groups]
 build = ["sip >=6,<7", "PyQt-builder >=1.17,<2", "PyQt6==6.8.1", "PyQt6-Qt6==6.8.2"]
