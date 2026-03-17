@@ -30,7 +30,7 @@ classifiers = [
 
 [project.urls]
 Upstream = "https://github.com/oclero/qlementine"
-Homepage = "https://github.com/pyapp-kit/PyQt6-Qlementine"
+Homepage = "https://github.com/pyapp-kit/PyQlementine"
 
 [tool.scikit-build]
 cmake.build-type = "Release"

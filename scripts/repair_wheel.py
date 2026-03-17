@@ -1,4 +1,10 @@
-"""Delocate wheel file."""
+"""Delocate wheel file.
+
+Sets the correct RPATH for Qt framework resolution at runtime.
+PyQt6 wheels need @loader_path/../PyQt6/Qt6/lib
+PySide6 wheels need @loader_path/../PySide6/Qt/lib plus PySide6 and shiboken6
+"""
+from __future__ import annotations
 
 import re
 import shutil
@@ -6,13 +12,43 @@ import sys
 from pathlib import Path
 from subprocess import run
 
+# RPATH configurations per Qt binding package
+RPATHS = {
+    "PyQt6": {
+        "darwin": ["@loader_path/../PyQt6/Qt6/lib"],
+        "linux": ["$ORIGIN/../PyQt6/Qt6/lib"],
+    },
+    "PySide6": {
+        "darwin": [
+            "@loader_path/../PySide6/Qt/lib",
+            "@loader_path/../shiboken6",
+            "@loader_path/../PySide6",
+        ],
+        "linux": [
+            "$ORIGIN/../PySide6/Qt/lib",
+            "$ORIGIN/../shiboken6",
+            "$ORIGIN/../PySide6",
+        ],
+    },
+}
+
+
+def detect_binding(wheel: str) -> str:
+    """Detect whether this is a PyQt6 or PySide6 wheel from its filename."""
+    name = Path(wheel).name.lower()
+    if "pyside6" in name:
+        return "PySide6"
+    return "PyQt6"
+
 
 def main() -> None:
     if sys.platform == "win32":
-        # nothing to do on non-Windows platforms
         return
 
     dest_dir, wheel, *_ = sys.argv[1:]
+    binding = detect_binding(wheel)
+    platform = "darwin" if sys.platform == "darwin" else "linux"
+    rpaths = RPATHS[binding][platform]
 
     # unzip the wheel to a tmp directory
     tmp_dir = Path(wheel).parent / "tmp"
@@ -21,9 +57,9 @@ def main() -> None:
     # fix the rpath in the tmp directory
     for so in Path(tmp_dir).rglob("*.so"):
         if sys.platform == "darwin":
-            fix_rpath_macos(so)
+            fix_rpath_macos(so, rpaths)
         else:
-            fix_rpath_linux(so)
+            fix_rpath_linux(so, rpaths)
 
     # re-zip the tmp directory and place it at dest_dir / wheel.name
     new_wheel = Path(dest_dir) / Path(wheel).name
@@ -37,28 +73,23 @@ def main() -> None:
 RPATH_RE_MAC = re.compile(r"^\s*path (.+) \(offset \d+\)$", re.MULTILINE)
 
 
-def fix_rpath_macos(so: Path, new_rpath: str = "@loader_path/../PyQt6/Qt6/lib") -> None:
+def fix_rpath_macos(so: Path, new_rpaths: list[str]) -> None:
     # delete all current rpaths
     current_rpath = run(["otool", "-l", str(so)], capture_output=True, text=True)
     for rpath in RPATH_RE_MAC.findall(current_rpath.stdout):
         run(["install_name_tool", "-delete_rpath", rpath, so], check=True)
 
-    # add new rpath
-    run(["install_name_tool", "-add_rpath", new_rpath, so], check=True)
-    print(f"Updated RPATH for {so} to {new_rpath}")
+    # add new rpaths
+    for rpath in new_rpaths:
+        run(["install_name_tool", "-add_rpath", rpath, so], check=True)
+    print(f"Updated RPATH for {so} to {new_rpaths}")
 
 
-def fix_rpath_linux(so: Path, new_rpath: str = "$ORIGIN/../PyQt6/Qt6/lib") -> None:
-    # delete all current rpaths
-    current_rpath = run(
-        ["patchelf", "--print-rpath", str(so)], capture_output=True, text=True
-    ).stdout.strip()
-
-    # Remove the old RPATH and add the new one
+def fix_rpath_linux(so: Path, new_rpaths: list[str]) -> None:
     run(["patchelf", "--remove-rpath", str(so)], check=True)
-    run(["patchelf", "--set-rpath", new_rpath, str(so)], check=True)
-
-    print(f"Updated RPATH for {so} from {current_rpath} to {new_rpath}")
+    rpath_str = ":".join(new_rpaths)
+    run(["patchelf", "--set-rpath", rpath_str, str(so)], check=True)
+    print(f"Updated RPATH for {so} to {rpath_str}")
 
 
 if __name__ == "__main__":
