@@ -6,6 +6,7 @@ from pathlib import Path
 
 from pyqtbuild import PyQtBindings, PyQtProject, QmakeBuilder
 
+
 def _find_repo_root() -> Path:
     """Walk up from this file to find the repo root (contains qlementine/)."""
     d = Path(__file__).resolve().parent

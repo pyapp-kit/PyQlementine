@@ -14,7 +14,9 @@ requires-python = ">=3.10"
 description = "PySide6 bindings for Qlementine, a modern QStyle for desktop Qt6 applications"
 license = { text = "MIT" }
 readme = "../../README.md"
-dependencies = ["PySide6>=6.8.0"]
+# shiboken6 6.8.3 broke the GilState ABI (constructor signature changed)
+# TODO: revisit upper bound when shiboken6 >=6.9 is available
+dependencies = ["PySide6>=6.8,<6.8.3"]
 classifiers = [
 	"Development Status :: 3 - Alpha",
 	"Intended Audience :: Developers",

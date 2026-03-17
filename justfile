@@ -6,14 +6,13 @@ export QT_VERSION := qt_version
 @_default:
     just --list
 
-# install dependencies and (re)-build PyQt6 package
-install: _clone _install-qt
-    uv sync --reinstall-package pyqt6-qlementine
+# install (re)-build pyqt6-qlementine
+install-pyqt6: _clone install-qt
+    uv sync --group pyqt6 --reinstall-package pyqt6-qlementine
 
-# install PySide6 package (requires shiboken6-generator)
-install-pyside6: _clone _install-qt
-    uv pip install --python .venv/bin/python shiboken6-generator==6.8.1
-    uv pip install --python .venv/bin/python packages/PySide6-Qlementine
+# install (re)-build pyside6-qlementine
+install-pyside6: _clone install-qt
+    uv sync --group pyside6 --reinstall-package pyside6-qlementine
 
 # Clean build artifacts
 clean:
@@ -27,13 +26,13 @@ demo:
 build-wheel:
     uvx cibuildwheel --config-file pyproject.toml packages/PyQt6-Qlementine
 
-_clone:
-    git submodule update --init --recursive
-
-_install-qt:
+install-qt:
     #!/usr/bin/env sh
     if [ -d "Qt/{{ qt_version }}" ]; then
         echo "Qt {{ qt_version }} already installed"
     else
         uvx --from aqtinstall aqt install-qt {{ host }} desktop {{ qt_version }} --outputdir Qt
     fi
+
+_clone:
+    git submodule update --init --recursive

@@ -21,7 +21,12 @@ set(PYSIDE6_INCLUDE_DIR "${PYSIDE6_DIR}/include")
 set(PYSIDE6_TYPESYSTEMS "${PYSIDE6_DIR}/typesystems")
 set(SHIBOKEN6_DIR "${PYTHON_SITE_PACKAGES}/shiboken6")
 set(SHIBOKEN6_GENERATOR_DIR "${PYTHON_SITE_PACKAGES}/shiboken6_generator")
-set(SHIBOKEN6_INCLUDE_DIR "${SHIBOKEN6_GENERATOR_DIR}/include")
+# Headers may be in shiboken6_generator/include (6.8) or shiboken6/include (6.10+)
+if(EXISTS "${SHIBOKEN6_GENERATOR_DIR}/include/shiboken.h")
+    set(SHIBOKEN6_INCLUDE_DIR "${SHIBOKEN6_GENERATOR_DIR}/include")
+else()
+    set(SHIBOKEN6_INCLUDE_DIR "${SHIBOKEN6_DIR}/include")
+endif()
 set(SHIBOKEN6_BIN "${SHIBOKEN6_GENERATOR_DIR}/shiboken6")
 
 # ---- Find Qt6 ----
@@ -251,7 +256,9 @@ target_include_directories(PySide6Qlementine PRIVATE
     ${Python_INCLUDE_DIRS}
 )
 
-# Find exact library files (versioned dylib names)
+# Link against libshiboken6/libpyside6 — the dylib ABI version (e.g. 6.8) is
+# stable across all patch releases within a minor series, so we pin the runtime
+# dependency to PySide6>=6.8,<6.9 to ensure the dylib name matches.
 file(GLOB SHIBOKEN6_LIB "${SHIBOKEN6_DIR}/libshiboken6*${CMAKE_SHARED_LIBRARY_SUFFIX}")
 file(GLOB PYSIDE6_LIB "${PYSIDE6_DIR}/libpyside6.abi3*${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
@@ -260,34 +267,31 @@ if(APPLE)
     target_link_libraries(PySide6Qlementine PRIVATE
         -Wl,-force_load $<TARGET_FILE:qlementine_static>
         Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Svg
-        ${SHIBOKEN6_LIB}
-        ${PYSIDE6_LIB}
+        ${SHIBOKEN6_LIB} ${PYSIDE6_LIB}
     )
 elseif(UNIX)
     target_link_libraries(PySide6Qlementine PRIVATE
         -Wl,--whole-archive qlementine_static -Wl,--no-whole-archive
         Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Svg
-        ${SHIBOKEN6_LIB}
-        ${PYSIDE6_LIB}
+        ${SHIBOKEN6_LIB} ${PYSIDE6_LIB}
     )
 else()
     target_link_libraries(PySide6Qlementine PRIVATE
         qlementine_static
         Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Svg
-        ${SHIBOKEN6_LIB}
-        ${PYSIDE6_LIB}
+        ${SHIBOKEN6_LIB} ${PYSIDE6_LIB}
     )
 endif()
 
-# Set RPATH to find Qt libs from PySide6 at runtime
+# Set RPATH to find Qt/shiboken/pyside libs at runtime
 if(APPLE)
     set_target_properties(PySide6Qlementine PROPERTIES
-        INSTALL_RPATH "@loader_path/../PySide6/Qt/lib"
+        INSTALL_RPATH "@loader_path/../PySide6/Qt/lib;@loader_path/../shiboken6;@loader_path/../PySide6"
         BUILD_WITH_INSTALL_RPATH OFF
     )
 elseif(UNIX)
     set_target_properties(PySide6Qlementine PROPERTIES
-        INSTALL_RPATH "$ORIGIN/../PySide6/Qt/lib"
+        INSTALL_RPATH "$ORIGIN/../PySide6/Qt/lib:$ORIGIN/../shiboken6:$ORIGIN/../PySide6"
         BUILD_WITH_INSTALL_RPATH OFF
     )
 endif()

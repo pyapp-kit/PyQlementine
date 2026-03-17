@@ -4,7 +4,7 @@ import sys
 
 if sys.platform == "win32":
     try:
-        import PySide6
+        import PySide6  # force Qt6/bin DLL directory registration
     except ImportError:
         raise ImportError(
             "PySide6 must be installed to use PySide6Qlementine."

@@ -5,7 +5,8 @@
     <load-typesystem name="typesystem_gui.xml" generate="no"/>
     <load-typesystem name="typesystem_widgets.xml" generate="no"/>
 
-    <!-- Reject utility functions/classes not in our public API -->
+    <!-- Reject appStyle free function (generates broken overload code in shiboken) -->
+    <rejection class="oclero::qlementine" function-name="appStyle"/>
     <rejection class="" function-name="colorizeImage"/>
     <rejection class="" function-name="colorizePixmap"/>
     <rejection class="" function-name="tintPixmap"/>
@@ -154,8 +155,7 @@
                 <modify-function signature="autoIconColor(const QWidget*)const" remove="all"/>
             </object-type>
 
-            <!-- Free function -->
-            <function signature="appStyle()"/>
+            <!-- appStyle() free function excluded: shiboken generates broken overload code -->
 
             <object-type name="ThemeManager">
                 <modify-function signature="ThemeManager(QObject*)">
