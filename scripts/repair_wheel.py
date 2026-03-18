@@ -4,6 +4,7 @@ Sets the correct RPATH for Qt framework resolution at runtime.
 PyQt6 wheels need @loader_path/../PyQt6/Qt6/lib
 PySide6 wheels need @loader_path/../PySide6/Qt/lib plus PySide6 and shiboken6
 """
+
 from __future__ import annotations
 
 import re

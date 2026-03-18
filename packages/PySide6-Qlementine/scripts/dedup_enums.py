@@ -10,6 +10,7 @@ Two patterns are deduplicated:
 2. Enum initialization blocks bounded by comment markers
    (e.g. // Initialization of enum 'X'. ... // End of 'X' enum.)
 """
+
 from __future__ import annotations
 
 import re
@@ -51,9 +52,7 @@ def dedup_module_wrapper(path: str) -> None:
                 seen_funcs.add(name)
 
         # Pattern 2: enum initialization blocks inside registerEnums_*()
-        m2 = re.match(
-            r"\s+// Initialization of enum '(\w+)'\.", line
-        )
+        m2 = re.match(r"\s+// Initialization of enum '(\w+)'\.", line)
         if m2:
             enum_name = m2.group(1)
             if enum_name in seen_enums:

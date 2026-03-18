@@ -6,7 +6,7 @@
 # ]
 #
 # [tool.uv.sources]
-# pyqt6-qlementine = { path = "wheelhouse/pyqt6_qlementine-1.4.2-cp310-abi3-macosx_11_0_arm64.whl" }
+# pyqt6-qlementine = { path = "../packages/PyQt6-Qlementine" }
 # ///
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import QJsonDocument, Qt

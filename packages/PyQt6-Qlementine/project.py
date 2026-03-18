@@ -53,7 +53,9 @@ class _Builder(QmakeBuilder):
 try:
     import PyQt6  # force addition of Qt6/bin to dll_directories
 except ImportError:
-    raise ImportError("PyQt6 must be installed in order to use PyQt6Qlementine.") from None
+    raise ImportError("
+        PyQt6 must be installed in order to use PyQt6Qlementine.
+    ") from None
 
 from ._qlementine import *
 del PyQt6

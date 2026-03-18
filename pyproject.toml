@@ -16,13 +16,14 @@ PySide6-Qlementine = { workspace = true }
 [dependency-groups]
 pyside6 = ["PySide6-Qlementine"]
 pyqt6 = ["PyQt6-Qlementine"]
-test = ["pytest>=8.3.4"]
+test = ["pytest>=8.3.4", "pytest-qt>=4.5.0"]
 dev = [
 	{ "include-group" = "test" },
 	"ruff>=0.9.8",
 	"aqtinstall>=3.2.0",
 	"prek>=0.3.1",
 	"typing_extensions",
+	"pyright>=1.1.408",
 ]
 
 [tool.cibuildwheel]
@@ -36,7 +37,7 @@ build = [
 manylinux-x86_64-image = "manylinux_2_28"
 build-frontend = "build[uv]"
 test-command = "pytest {project}/tests -v"
-test-requires = ["pytest>=8.3.4"]
+test-requires = ["pytest>=8.3.4", "pytest-qt>=4.5.0"]
 
 [tool.cibuildwheel.linux]
 environment-pass = ["QT_VERSION"]

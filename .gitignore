@@ -126,3 +126,5 @@ aqtinstall.log
 wheelhouse/
 uv.lock
 packages/PySide6-Qlementine/_build/
+packages/pyqt6_qlementine-*.tar.gz
+packages/pyside6_qlementine-*.tar.gz
