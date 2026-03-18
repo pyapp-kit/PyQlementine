@@ -1,3 +1,4 @@
 [submodule "qlementine"]
 	path = qlementine
 	url = https://github.com/oclero/qlementine
+	ignore = dirty
