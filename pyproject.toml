@@ -55,7 +55,7 @@ test-command = [
 ]
 
 [tool.cibuildwheel.macos]
-environment = { MACOSX_DEPLOYMENT_TARGET = "13.0" }
+environment = { MACOSX_DEPLOYMENT_TARGET = "13.0", CC = "/usr/bin/cc", CXX = "/usr/bin/c++" }
 before-build = "uvx --from aqtinstall==3.2.0 aqt install-qt mac desktop $QT_VERSION --outputdir Qt --base http://mirrors.ocf.berkeley.edu/qt/"
 repair-wheel-command = ["python scripts/repair_wheel.py {dest_dir} {wheel}"]
 

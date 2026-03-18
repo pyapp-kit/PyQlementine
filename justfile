@@ -45,18 +45,18 @@ demo:
 
 # build wheel (into ./wheelhouse)
 [unix]
-build-wheel target="PyQt6":
+build-wheel target="PyQt6": _clone
     #!/usr/bin/env sh
     if echo "{{target}}" | grep -qi pyside; then
         export QT_VERSION=6.10.2
     else
         export QT_VERSION=6.8.1
     fi
-    just install-qt qt_version=$QT_VERSION
+    just install-qt $QT_VERSION
     uvx cibuildwheel --config-file pyproject.toml packages/{{target}}-Qlementine
 
 [windows]
-build-wheel target="PyQt6":
+build-wheel target="PyQt6": _clone
     $qt_version = if ("{{target}}" -match "(?i)pyside") { "6.10.2" } else { "6.8.1" }; \
     just install-qt qt_version=$qt_version; \
     uvx cibuildwheel --config-file pyproject.toml packages/{{target}}-Qlementine
