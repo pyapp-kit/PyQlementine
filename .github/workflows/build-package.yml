@@ -50,6 +50,11 @@ jobs:
           package-dir: packages/${{ inputs.package }}
           config-file: pyproject.toml
 
+      - name: Inspect wheels
+        run: |
+          uvx check-wheel-contents ./wheelhouse/*.whl --ignore W009,W010
+          uvx twine check --strict ./wheelhouse/*.whl
+
       - name: Upload wheels
         uses: actions/upload-artifact@v7
         with:
