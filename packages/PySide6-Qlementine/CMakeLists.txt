@@ -29,22 +29,6 @@ foreach(dir ${QT_INSTALL_DIRS})
     list(APPEND CMAKE_PREFIX_PATH "${dir}")
 endforeach()
 
-# Patch deprecated AGL framework reference before finding Qt
-# (AGL was removed in recent macOS SDKs)
-if(APPLE)
-    file(GLOB_RECURSE _fwo_files "${REPO_ROOT}/Qt/*/FindWrapOpenGL.cmake")
-    foreach(_fwo ${_fwo_files})
-        file(READ "${_fwo}" _fwo_content)
-        string(FIND "${_fwo_content}" "AGL" _has_agl)
-        if(NOT _has_agl EQUAL -1)
-            string(REPLACE "find_library(WrapOpenGL_AGL NAMES AGL)" "" _fwo_content "${_fwo_content}")
-            string(REPLACE "-framework AGL" "" _fwo_content "${_fwo_content}")
-            file(WRITE "${_fwo}" "${_fwo_content}")
-            message(STATUS "Patched AGL in ${_fwo}")
-        endif()
-    endforeach()
-endif()
-
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Svg)
 
 # ---- Build qlementine static library ----
