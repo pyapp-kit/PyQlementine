@@ -1,0 +1,72 @@
+name: Build Package
+
+on:
+  workflow_call:
+    inputs:
+      package:
+        required: true
+        type: string
+        description: "Package name (PyQt6-Qlementine or PySide6-Qlementine)"
+      qt_version:
+        required: true
+        type: string
+        description: "Qt version to build against"
+      cibw_manylinux:
+        required: false
+        type: string
+        default: "manylinux_2_28"
+
+jobs:
+  build-sdist:
+    name: sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: "recursive"
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v7
+      - run: uv build --package ${{ inputs.package }} --sdist --out-dir dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sdist-${{ inputs.package }}
+          path: dist/*.tar.gz
+
+  build-wheels:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    env:
+      QT_VERSION: ${{ inputs.qt_version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: "recursive"
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v7
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Apply submodule patches
+        shell: bash
+        run: |
+          for p in patches/*.patch; do
+            [ -f "$p" ] && git -C qlementine apply "$GITHUB_WORKSPACE/$p"
+          done
+
+      - name: Build wheels via cibuildwheel
+        uses: pypa/cibuildwheel@v3.4
+        env:
+          CIBW_VERBOSE: 1
+          CIBW_MANYLINUX_X86_64_IMAGE: ${{ inputs.cibw_manylinux }}
+        with:
+          package-dir: packages/${{ inputs.package }}
+          config-file: pyproject.toml
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v7
+        with:
+          name: wheels-${{ inputs.package }}-${{ runner.os }}-${{ runner.arch }}
+          path: ./wheelhouse/*.whl

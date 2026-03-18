@@ -1,0 +1,37 @@
+name: Publish PySide6-Qlementine
+
+on:
+  push:
+    tags:
+      - "pyside6/v*"
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-package.yml
+    with:
+      package: PySide6-Qlementine
+      qt_version: "6.10.2"
+      cibw_manylinux: "manylinux_2_34"
+
+  publish:
+    name: Publish to PyPI
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: "{sdist,wheels}-PySide6-Qlementine*"
+          path: dist
+          merge-multiple: true
+
+      - name: 🚢 Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: "./dist/*"

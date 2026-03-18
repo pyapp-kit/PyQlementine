@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pyqt6:
+    uses: ./.github/workflows/build-package.yml
+    with:
+      package: PyQt6-Qlementine
+      qt_version: "6.8.1"
+
+  pyside6:
+    uses: ./.github/workflows/build-package.yml
+    with:
+      package: PySide6-Qlementine
+      qt_version: "6.10.2"
+      cibw_manylinux: "manylinux_2_34"
