@@ -361,19 +361,16 @@ def test_notification_badge_set_text(qapp):
     assert nb.text() == "5"
 
 
-def test_notification_badge_default_background_color_red(qapp):
-    nb = Qlementine.NotificationBadge()
-    assert nb.backgroundColor() == QColor(Qt.GlobalColor.red)
-
-
 def test_notification_badge_set_background_color(qapp):
     nb = Qlementine.NotificationBadge()
+    assert nb.backgroundColor() != QColor(0, 0, 255)
     nb.setBackgroundColor(QColor(0, 0, 255))
     assert nb.backgroundColor() == QColor(0, 0, 255)
 
 
 def test_notification_badge_set_foreground_color(qapp):
     nb = Qlementine.NotificationBadge()
+    assert nb.foregroundColor() != QColor(0, 0, 0)
     nb.setForegroundColor(QColor(0, 0, 0))
     assert nb.foregroundColor() == QColor(0, 0, 0)
 

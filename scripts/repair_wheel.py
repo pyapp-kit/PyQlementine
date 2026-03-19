@@ -10,6 +10,7 @@ from __future__ import annotations
 import re
 import shutil
 import sys
+import sysconfig
 from pathlib import Path
 from subprocess import run
 
@@ -91,6 +92,25 @@ def fix_rpath_linux(so: Path, new_rpaths: list[str]) -> None:
     rpath_str = ":".join(new_rpaths)
     run(["patchelf", "--set-rpath", rpath_str, str(so)], check=True)
     print(f"Updated RPATH for {so} to {rpath_str}")
+
+
+def fix_installed(binding: str = "PyQt6") -> None:
+    """Fix RPATHs on an already-installed package in site-packages."""
+    if sys.platform == "win32":
+        return
+
+    PKG_NAMES = {"PyQt6": "PyQt6Qlementine", "PySide6": "PySide6Qlementine"}
+    pkg_dir = Path(sysconfig.get_path("purelib")) / PKG_NAMES[binding]
+    if not pkg_dir.exists():
+        raise FileNotFoundError(f"{pkg_dir} not found")
+
+    platform = "darwin" if sys.platform == "darwin" else "linux"
+    rpaths = RPATHS[binding][platform]
+    for so in pkg_dir.rglob("*.so"):
+        if sys.platform == "darwin":
+            fix_rpath_macos(so, rpaths)
+        else:
+            fix_rpath_linux(so, rpaths)
 
 
 if __name__ == "__main__":
