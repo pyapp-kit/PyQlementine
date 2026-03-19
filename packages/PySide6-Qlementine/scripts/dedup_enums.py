@@ -1,9 +1,13 @@
 """Remove duplicate enum converter code from shiboken6 output.
 
-Shiboken6 >=6.8.2 has a bug where namespace-level enum converter functions
-and initialization blocks are emitted once per wrapped type instead of once
-globally. This script removes the duplicates, keeping only the first
-occurrence.
+Shiboken6 does not fully support nested invisible namespaces
+(e.g. ``<namespace-type name="outer" visible="false">`` containing
+``<namespace-type name="inner" visible="false">``).  One consequence is
+that namespace-level enum converter functions and initialization blocks
+are emitted multiple times in the module wrapper.  This script removes
+the duplicates, keeping only the first occurrence.
+
+See https://qt-project.atlassian.net/browse/PYSIDE-3291
 
 Two patterns are deduplicated:
 1. File-scope static converter functions (e.g. Enum_PythonToCpp_...)

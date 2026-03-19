@@ -190,8 +190,9 @@ shiboken_generator_create_binding(
     FORCE_LIMITED_API
 )
 
-# Work around shiboken6 bug: namespace-level enum converters are emitted once
-# per wrapped type instead of once globally. Deduplicate after generation.
+# Work around shiboken6 limitation: nested invisible namespaces cause
+# namespace-level enum converters to be emitted multiple times.
+# See https://qt-project.atlassian.net/browse/PYSIDE-3291
 set(MODULE_WRAPPER "${GENERATED_DIR}/pyside6qlementine_module_wrapper.cpp")
 set(DEDUP_STAMP "${GENERATED_DIR}/.dedup_stamp")
 add_custom_command(
