@@ -139,6 +139,11 @@
             <!-- ====== OBJECT TYPES ====== -->
 
             <object-type name="QlementineStyle">
+                <enum-type name="StandardPixmapExt"/>
+                <enum-type name="ControlElementExt"/>
+                <enum-type name="ContentsTypeExt"/>
+                <enum-type name="PixelMetricExt"/>
+                <enum-type name="PrimitiveElementExt"/>
                 <!-- Per-widget overloads not exposed in SIP -->
                 <modify-function signature="setAutoIconColor(QWidget*,oclero::qlementine::AutoIconColor)" remove="all"/>
                 <modify-function signature="autoIconColor(const QWidget*)const" remove="all"/>

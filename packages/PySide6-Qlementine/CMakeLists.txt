@@ -233,8 +233,34 @@ elseif(UNIX)
     )
 endif()
 
+# ---- Generate type stubs (.pyi) ----
+# Stage the module so Python can import it, then run the stub generator.
+# This mirrors how PySide6 itself generates stubs at build time.
+set(STUB_STAGING "${CMAKE_CURRENT_BINARY_DIR}/_stub_staging")
+set(STUB_PKG "${STUB_STAGING}/PySide6Qlementine")
+set(STUB_OUTPUT "${STUB_PKG}/__init__.pyi")
+
+add_custom_command(
+    OUTPUT ${STUB_OUTPUT}
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${STUB_PKG}"
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_CURRENT_SOURCE_DIR}/PySide6Qlementine/__init__.py"
+        "${STUB_PKG}/__init__.py"
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+        "$<TARGET_FILE:PySide6Qlementine>"
+        "${STUB_PKG}/$<TARGET_FILE_NAME:PySide6Qlementine>"
+    COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${STUB_STAGING}"
+        "${Python_EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_stubs.py"
+        --outdir "${STUB_PKG}"
+    DEPENDS PySide6Qlementine
+    COMMENT "Generating type stubs for PySide6Qlementine"
+)
+add_custom_target(generate_stubs ALL DEPENDS ${STUB_OUTPUT})
+
 # Install
 install(TARGETS PySide6Qlementine
     LIBRARY DESTINATION PySide6Qlementine
     RUNTIME DESTINATION PySide6Qlementine
 )
+install(FILES ${STUB_OUTPUT} DESTINATION PySide6Qlementine)

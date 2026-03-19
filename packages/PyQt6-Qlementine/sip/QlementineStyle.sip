@@ -13,6 +13,29 @@ class QlementineStyle : QCommonStyle
 %End
 
 public:
+    enum class StandardPixmapExt {
+        SP_Check,
+        SP_Calendar,
+    };
+
+    enum class ControlElementExt {
+        CE_CommandButtonLabel,
+        CE_CommandButton,
+    };
+
+    enum class ContentsTypeExt {
+        CT_CommandButton,
+    };
+
+    enum class PixelMetricExt {
+        PM_MediumIconSize,
+    };
+
+    enum class PrimitiveElementExt {
+        PE_CommandButtonPanel,
+        PE_CommandButtonLabel,
+    };
+
     explicit QlementineStyle(QObject* parent /TransferThis/ = nullptr);
     virtual ~QlementineStyle();
 

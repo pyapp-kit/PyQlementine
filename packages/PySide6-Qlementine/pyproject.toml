@@ -3,6 +3,7 @@ requires = [
     "scikit-build-core>=0.10",
     "shiboken6-generator>=6.10",
     "PySide6>=6.10",
+    "ruff>=0.4",
 ]
 build-backend = "scikit_build_core.build"
 
