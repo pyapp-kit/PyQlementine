@@ -1,0 +1,19 @@
+diff --git a/lib/src/style/ThemeManager.cpp b/lib/src/style/ThemeManager.cpp
+index 296b3f2..fa4a203 100644
+--- a/lib/src/style/ThemeManager.cpp
++++ b/lib/src/style/ThemeManager.cpp
+@@ -12,13 +12,10 @@ ThemeManager::ThemeManager(QObject* parent)
+ ThemeManager::ThemeManager(QlementineStyle* style, QObject* parent)
+   : QObject(parent) {
+   setStyle(style);
+-  if (parent == nullptr) {
+-    setParent(style);
+-  }
+ }
+ 
+ QlementineStyle* ThemeManager::style() const {
+-  return nullptr;
++  return _style;
+ }
+ 
+ void ThemeManager::setStyle(QlementineStyle* style) {

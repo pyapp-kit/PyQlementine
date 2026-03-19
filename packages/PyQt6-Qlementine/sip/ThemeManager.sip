@@ -11,8 +11,8 @@ class ThemeManager : QObject
 %End
 
 public:
-    explicit ThemeManager(QObject* parent /TransferThis/ = nullptr);
     explicit ThemeManager(QlementineStyle* style, QObject* parent /TransferThis/ = nullptr);
+    explicit ThemeManager(QObject* parent /TransferThis/ = nullptr);
     virtual ~ThemeManager();
 
     QlementineStyle* style() const;

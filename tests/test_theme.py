@@ -249,6 +249,25 @@ def test_theme_manager_with_style(qapp):
     assert style.theme().borderRadius == 12.0
 
 
+def test_theme_manager_constructor_with_style(qapp):
+    """Regression test for oclero/qlementine#148."""
+    style = QlementineStyle()
+    tm = ThemeManager(style)
+
+    # style() previously returned nullptr
+    assert tm.style() is style
+
+    # setParent(style) in constructor caused ownership conflict,
+    # invalidating the internal QPointer so setCurrentTheme silently failed
+    t = Theme()
+    t.meta.name = "Test"
+    t.borderRadius = 42.0
+    tm.addTheme(t)
+    tm.setCurrentTheme("Test")
+    assert tm.currentTheme() == "Test"
+    assert style.theme().borderRadius == 42.0
+
+
 def test_theme_manager_load_directory(qapp):
     tm = ThemeManager()
     tm.loadDirectory(str(THEMES_DIR))
