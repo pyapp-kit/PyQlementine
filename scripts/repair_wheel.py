@@ -18,7 +18,7 @@ import sysconfig
 from base64 import urlsafe_b64encode
 from pathlib import Path
 from subprocess import run
-from zipfile import ZipFile
+from zipfile import ZIP_DEFLATED, ZipFile
 
 # RPATH configurations per Qt binding package
 RPATHS = {
@@ -106,9 +106,7 @@ def _regenerate_record(unpacked_dir: Path) -> None:
         rows.append([rel, digest, str(size)])
 
     # RECORD itself is listed with no hash
-    rows.append(
-        [record_path.relative_to(unpacked_dir).as_posix(), "", ""]
-    )
+    rows.append([record_path.relative_to(unpacked_dir).as_posix(), "", ""])
 
     buf = io.StringIO()
     writer = csv.writer(buf, lineterminator="\n")
@@ -118,7 +116,7 @@ def _regenerate_record(unpacked_dir: Path) -> None:
 
 def _zip_directory(source_dir: Path, dest: Path) -> None:
     """Zip a directory into a wheel file (deterministic, no compression dirs)."""
-    with ZipFile(dest, "w") as zf:
+    with ZipFile(dest, "w", compression=ZIP_DEFLATED) as zf:
         for file in sorted(source_dir.rglob("*")):
             if file.is_dir():
                 continue
