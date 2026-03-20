@@ -48,19 +48,19 @@ demo:
 [unix]
 build-wheel target="PyQt6": _clone
     #!/usr/bin/env sh
-    if echo "{{target}}" | grep -qi pyside; then
+    if echo "{{ target }}" | grep -qi pyside; then
         export QT_VERSION=6.10.2
     else
         export QT_VERSION=6.8.1
     fi
     just install-qt $QT_VERSION
-    uvx cibuildwheel --config-file pyproject.toml packages/{{target}}-Qlementine
+    uvx cibuildwheel --config-file pyproject.toml packages/{{ target }}-Qlementine
 
 [windows]
 build-wheel target="PyQt6": _clone
-    $qt_version = if ("{{target}}" -match "(?i)pyside") { "6.10.2" } else { "6.8.1" }; \
+    $qt_version = if ("{{ target }}" -match "(?i)pyside") { "6.10.2" } else { "6.8.1" }; \
     just install-qt qt_version=$qt_version; \
-    uvx cibuildwheel --config-file pyproject.toml packages/{{target}}-Qlementine
+    uvx cibuildwheel --config-file pyproject.toml packages/{{ target }}-Qlementine
 
 [unix]
 install-qt qt_version="6.8.1":
@@ -73,16 +73,16 @@ install-qt qt_version="6.8.1":
 
 [windows]
 install-qt qt_version="6.8.1":
-    if (Test-Path "Qt/{{qt_version}}") { \
-        Write-Host "Qt {{qt_version}} already installed" \
+    if (Test-Path "Qt/{{ qt_version }}") { \
+        Write-Host "Qt {{ qt_version }} already installed" \
     } else { \
-        uvx --from aqtinstall aqt install-qt {{host}} desktop {{qt_version}} {{win_arch}} --outputdir Qt \
+        uvx --from aqtinstall aqt install-qt {{ host }} desktop {{ qt_version }} {{ win_arch }} --outputdir Qt \
     }
 
 # point the qlementine submodule to a specific commit (default: origin/dev HEAD)
 update-submodule sha="origin/dev":
     git -C qlementine fetch origin
-    git -C qlementine checkout {{sha}}
+    git -C qlementine checkout {{ sha }}
     git add qlementine
 
 _clone:
@@ -116,8 +116,8 @@ _vcvars +cmd:
     $vsPath = & $vswhere -latest -property installationPath; \
     if (-not $vsPath) { throw "No Visual Studio installation found" }; \
     Import-Module (Join-Path $vsPath 'Common7\Tools\Microsoft.VisualStudio.DevShell.dll'); \
-    Enter-VsDevShell -VsInstallPath $vsPath -SkipAutomaticLocation -DevCmdArguments "-arch={{win_msvc_arch}}" *>$null; \
-    Invoke-Expression "{{cmd}}"
+    Enter-VsDevShell -VsInstallPath $vsPath -SkipAutomaticLocation -DevCmdArguments "-arch={{ win_msvc_arch }}" *>$null; \
+    Invoke-Expression "{{ cmd }}"
 
 [windows]
 _patch:
@@ -138,3 +138,8 @@ _patch:
             } \
         } \
     }
+
+release tag:
+    git tag -a "pyqt6/{{ tag }}" -m "pyqt6-qlementine {{ tag }}"
+    git tag -a "pyside6/{{ tag }}" -m "pyside6-qlementine {{ tag }}"
+    git push upstream --follow-tags
