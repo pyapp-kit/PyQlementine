@@ -1,0 +1,13 @@
+diff --git a/lib/src/utils/PrimitiveUtils.cpp b/lib/src/utils/PrimitiveUtils.cpp
+index 2964eb9..eb0bcd5 100644
+--- a/lib/src/utils/PrimitiveUtils.cpp
++++ b/lib/src/utils/PrimitiveUtils.cpp
+@@ -191,7 +191,7 @@ void drawRoundedRect(QPainter* p, QRectF const& rect, QBrush const& brush, qreal
+   }
+ }
+ 
+-void drawRoundedRectF(QPainter* p, QRectF const& rect, QBrush const& brush, RadiusesF const& radiuses) {
++void drawRoundedRect(QPainter* p, QRectF const& rect, QBrush const& brush, RadiusesF const& radiuses) {
+   if (radiuses.hasSameRadius()) {
+     drawRoundedRect(p, rect, brush, radiuses.topLeft);
+   } else {
