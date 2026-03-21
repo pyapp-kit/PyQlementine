@@ -2,10 +2,56 @@ import os
 import platform
 import re
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
 from pyqtbuild import PyQtBindings, PyQtProject, QmakeBuilder
+
+# Relative rpaths so the .so resolves Qt from PyQt6 at runtime.
+_RPATHS = {
+    "darwin": ["@loader_path/../PyQt6/Qt6/lib"],
+    "linux": ["$ORIGIN/../PyQt6/Qt6/lib"],
+}
+
+RPATH_RE_MAC = re.compile(r"^\s*path (.+) \(offset \d+\)$", re.MULTILINE)
+
+
+def fix_rpath_macos(so: Path, new_rpaths: list[str]) -> None:
+    # delete all current rpaths
+    current_rpath = subprocess.run(
+        ["otool", "-l", str(so)], capture_output=True, text=True
+    )
+    for rpath in RPATH_RE_MAC.findall(current_rpath.stdout):
+        subprocess.run(
+            ["install_name_tool", "-delete_rpath", rpath, str(so)], check=True
+        )
+
+    # add new rpaths
+    for rpath in new_rpaths:
+        subprocess.run(
+            ["install_name_tool", "-add_rpath", rpath, str(so)], check=True
+        )
+    print(f"Updated RPATH for {so} to {new_rpaths}")
+
+
+def fix_rpath_linux(so: Path, new_rpaths: list[str]) -> None:
+    subprocess.run(["patchelf", "--remove-rpath", str(so)], check=True)
+    rpath_str = ":".join(new_rpaths)
+    subprocess.run(
+        ["patchelf", "--set-rpath", rpath_str, str(so)], check=True
+    )
+    print(f"Updated RPATH for {so} to {rpath_str}")
+
+
+def fix_rpaths(package_dir: Path) -> None:
+    """Fix rpaths on installed .so files to resolve Qt from PyQt6."""
+    rpaths = _RPATHS["darwin" if sys.platform == "darwin" else "linux"]
+    for so in package_dir.rglob("*.so"):
+        if sys.platform == "darwin":
+            fix_rpath_macos(so, rpaths)
+        else:
+            fix_rpath_linux(so, rpaths)
 
 
 def _find_repo_root() -> Path:
@@ -76,14 +122,16 @@ del PyQt6
 
         stubs.write_text(stubs_src)
         if shutil.which("ruff"):
-            import subprocess
-
             subprocess.run(
                 ["ruff", "check", str(stubs), "--fix-only", "--select", "E,F,W,I,TC"]
             )
             subprocess.run(["ruff", "format", str(stubs), "--line-length", "110"])
 
         (package / "py.typed").touch()
+
+        # Fix rpaths so the .so resolves Qt from PyQt6 at runtime.
+        if sys.platform != "win32":
+            fix_rpaths(package)
 
 
 class PyQt6Qlementine(PyQtProject):
