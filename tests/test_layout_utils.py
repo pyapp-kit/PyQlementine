@@ -4,25 +4,27 @@ from __future__ import annotations
 
 from _qt_compat import Qlementine, QtWidgets, QWidget
 
+pytestmark = __import__("conftest").skip_no_utils
+
 
 def test_get_layout_margins(qapp):
     w = QWidget()
     w.setLayout(QtWidgets.QVBoxLayout())
-    margins = Qlementine.getLayoutMargins(w)
+    margins = Qlementine.utils.getLayoutMargins(w)
     assert isinstance(margins, QtWidgets.QStyle.__class__) or margins is not None
 
 
 def test_get_layout_h_spacing(qapp):
     w = QWidget()
     w.setLayout(QtWidgets.QHBoxLayout())
-    spacing = Qlementine.getLayoutHSpacing(w)
+    spacing = Qlementine.utils.getLayoutHSpacing(w)
     assert isinstance(spacing, int)
 
 
 def test_get_layout_v_spacing(qapp):
     w = QWidget()
     w.setLayout(QtWidgets.QVBoxLayout())
-    spacing = Qlementine.getLayoutVSpacing(w)
+    spacing = Qlementine.utils.getLayoutVSpacing(w)
     assert isinstance(spacing, int)
 
 
@@ -33,5 +35,5 @@ def test_clear_layout(qapp):
     layout.addWidget(QWidget())
     layout.addWidget(QWidget())
     assert layout.count() == 2
-    Qlementine.clearLayout(layout)
+    Qlementine.utils.clearLayout(layout)
     assert layout.count() == 0

@@ -4,50 +4,52 @@ from __future__ import annotations
 
 from _qt_compat import Qlementine, QWidget
 
+pytestmark = __import__("conftest").skip_no_utils
+
 
 def test_should_have_hover_events(qapp):
     w = QWidget()
-    result = Qlementine.shouldHaveHoverEvents(w)
+    result = Qlementine.utils.shouldHaveHoverEvents(w)
     assert isinstance(result, bool)
 
 
 def test_should_have_mouse_tracking(qapp):
     w = QWidget()
-    result = Qlementine.shouldHaveMouseTracking(w)
+    result = Qlementine.utils.shouldHaveMouseTracking(w)
     assert isinstance(result, bool)
 
 
 def test_should_have_bold_font(qapp):
     w = QWidget()
-    result = Qlementine.shouldHaveBoldFont(w)
+    result = Qlementine.utils.shouldHaveBoldFont(w)
     assert isinstance(result, bool)
 
 
 def test_should_have_external_focus_frame(qapp):
     w = QWidget()
-    result = Qlementine.shouldHaveExternalFocusFrame(w)
+    result = Qlementine.utils.shouldHaveExternalFocusFrame(w)
     assert isinstance(result, bool)
 
 
 def test_should_have_tab_focus(qapp):
     w = QWidget()
-    result = Qlementine.shouldHaveTabFocus(w)
+    result = Qlementine.utils.shouldHaveTabFocus(w)
     assert isinstance(result, bool)
 
 
 def test_should_not_be_vertically_compressed(qapp):
     w = QWidget()
-    result = Qlementine.shouldNotBeVerticallyCompressed(w)
+    result = Qlementine.utils.shouldNotBeVerticallyCompressed(w)
     assert isinstance(result, bool)
 
 
 def test_should_not_have_wheel_events(qapp):
     w = QWidget()
-    result = Qlementine.shouldNotHaveWheelEvents(w)
+    result = Qlementine.utils.shouldNotHaveWheelEvents(w)
     assert isinstance(result, bool)
 
 
 def test_get_tab_count(qapp):
     w = QWidget()
-    result = Qlementine.getTabCount(w)
+    result = Qlementine.utils.getTabCount(w)
     assert isinstance(result, int)

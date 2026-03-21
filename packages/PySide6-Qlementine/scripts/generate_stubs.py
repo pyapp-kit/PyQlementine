@@ -77,34 +77,94 @@ def main() -> None:
         text,
     )
 
-    dest.write_text(text)
+    # Split stubs into __init__.pyi (types) and utils.pyi (functions)
+    init_pyi, utils_pyi = _split_stubs(text)
+
+    dest.write_text(init_pyi)
+    utils_dest = dest.parent / "utils.pyi"
+    utils_dest.write_text(utils_pyi)
     generated.unlink()
 
     # Run ruff to clean up the generated stubs (best-effort)
-    if ruff := shutil.which("ruff"):
-        ruff_args = ["--target-version", "py310"]
-        subprocess.run(
-            [
-                ruff,
-                "check",
-                *ruff_args,
-                "--fix",
-                "--unsafe-fixes",
-                str(dest),
-                "--select",
-                "E,F,W,I,UP,RUF",
-                "--ignore",
-                "E501",
-                "--quiet",
-            ],
-            check=False,
-        )
-        subprocess.run(
-            [ruff, "format", *ruff_args, str(dest), "--line-length", "116"],
-            check=False,
-        )
+    for stub_path in (dest, utils_dest):
+        _run_ruff(stub_path)
 
-    print(f"Wrote stubs to {dest}")
+    print(f"Wrote stubs to {dest} and {utils_dest}")
+
+
+def _split_stubs(content: str) -> tuple[str, str]:
+    """Split a flat .pyi into (__init__.pyi, utils.pyi).
+
+    Classes/enums/imports + ``appStyle`` go to __init__.pyi.
+    All other top-level ``def`` blocks go to utils.pyi.
+    """
+    lines = content.split("\n")
+    init_lines: list[str] = []
+    utils_lines: list[str] = []
+    pending_decorators: list[str] = []
+
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+
+        if line.startswith("@"):
+            pending_decorators.append(line)
+            i += 1
+        elif line.startswith("def "):
+            block = [line]
+            i += 1
+            while i < len(lines) and lines[i].startswith((" ", "\t")):
+                block.append(lines[i])
+                i += 1
+
+            func_name = line.split("(")[0].removeprefix("def ").strip()
+            if func_name == "appStyle":
+                init_lines.extend(pending_decorators)
+                init_lines.extend(block)
+            else:
+                utils_lines.extend(pending_decorators)
+                utils_lines.extend(block)
+            pending_decorators.clear()
+        else:
+            init_lines.extend(pending_decorators)
+            pending_decorators.clear()
+            init_lines.append(line)
+            i += 1
+
+    # utils.pyi needs the same import header plus re-import of our types
+    header: list[str] = []
+    for ln in init_lines:
+        if ln.startswith(("import ", "from ", "#", "try:", "    ", "except")):
+            header.append(ln)
+        elif ln.strip() == "" and header:
+            header.append(ln)
+        else:
+            break
+
+    utils_header = "\n".join(header).rstrip() + "\n\nfrom . import *\n\n"
+    init_pyi = "\n".join(init_lines)
+    utils_pyi = utils_header + "\n".join(utils_lines) + "\n"
+
+    init_pyi = init_pyi.rstrip() + "\n\nfrom . import utils as utils\n"
+
+    return init_pyi, utils_pyi
+
+
+def _run_ruff(path: Path) -> None:
+    if not (ruff := shutil.which("ruff")):
+        return
+    ruff_args = ["--target-version", "py310"]
+    subprocess.run(
+        [
+            ruff, "check", *ruff_args, "--fix", "--unsafe-fixes",
+            str(path), "--select", "E,F,W,I,UP,RUF", "--ignore", "E501", "--quiet",
+        ],
+        check=False,
+    )
+    subprocess.run(
+        [ruff, "format", *ruff_args, str(path), "--line-length", "116"],
+        check=False,
+    )
 
 
 if __name__ == "__main__":

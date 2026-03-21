@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from _qt_compat import QColor, QIcon, Qlementine, QSize
+from _qt_compat import QColor, QIcon, Qlementine, QSize, QtCore
 
 IconTheme = Qlementine.IconTheme
+
+pytestmark = __import__("conftest").skip_no_utils
 
 
 def test_icon_theme_single_color():
@@ -40,19 +42,15 @@ def test_icon_theme_color_method():
 def test_make_icon_from_svg_data(qapp):
     svg = b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">'
     svg += b"<circle cx='8' cy='8' r='6'/></svg>"
-    from PyQt6.QtCore import QByteArray
-
-    data = QByteArray(svg)
-    icon = Qlementine.makeIconFromSvgData(data, QSize(16, 16))
+    data = QtCore.QByteArray(svg)
+    icon = Qlementine.utils.makeIconFromSvgData(data, QSize(16, 16))
     assert isinstance(icon, QIcon)
 
 
 def test_make_icon_from_svg_data_with_theme(qapp):
     svg = b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">'
     svg += b"<circle cx='8' cy='8' r='6'/></svg>"
-    from PyQt6.QtCore import QByteArray
-
-    data = QByteArray(svg)
+    data = QtCore.QByteArray(svg)
     theme = IconTheme(QColor(255, 0, 0))
-    icon = Qlementine.makeIconFromSvgData(data, theme, QSize(16, 16))
+    icon = Qlementine.utils.makeIconFromSvgData(data, theme, QSize(16, 16))
     assert isinstance(icon, QIcon)

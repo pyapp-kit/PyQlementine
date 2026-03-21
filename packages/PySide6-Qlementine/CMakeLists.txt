@@ -248,6 +248,9 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy
         "${CMAKE_CURRENT_SOURCE_DIR}/PySide6Qlementine/__init__.py"
         "${STUB_PKG}/__init__.py"
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_CURRENT_SOURCE_DIR}/PySide6Qlementine/utils.py"
+        "${STUB_PKG}/utils.py"
     COMMAND ${CMAKE_COMMAND} -E create_symlink
         "$<TARGET_FILE:PySide6Qlementine>"
         "${STUB_PKG}/$<TARGET_FILE_NAME:PySide6Qlementine>"
@@ -265,4 +268,9 @@ install(TARGETS PySide6Qlementine
     LIBRARY DESTINATION PySide6Qlementine
     RUNTIME DESTINATION PySide6Qlementine
 )
-install(FILES ${STUB_OUTPUT} DESTINATION PySide6Qlementine)
+install(FILES
+    ${STUB_OUTPUT}
+    ${STUB_PKG}/utils.pyi
+    "${CMAKE_CURRENT_SOURCE_DIR}/PySide6Qlementine/utils.py"
+    DESTINATION PySide6Qlementine
+)

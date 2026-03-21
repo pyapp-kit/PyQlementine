@@ -24,4 +24,20 @@ if sys.platform == "win32":
 
     del PySide6, shiboken6, os, _mod, _dir, _qt_bin
 
-from .PySide6Qlementine import *  # noqa: F403
+def _init():
+    import types
+    from . import PySide6Qlementine as _ql
+
+    ns = globals()
+    _promoted = frozenset({"appStyle"})
+    for name in dir(_ql):
+        if name.startswith("_"):
+            continue
+        obj = getattr(_ql, name)
+        if not isinstance(obj, types.BuiltinFunctionType) or name in _promoted:
+            ns[name] = obj
+
+_init()
+del _init
+
+from . import utils as utils

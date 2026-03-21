@@ -6,45 +6,12 @@
     <load-typesystem name="typesystem_widgets.xml" generate="no"/>
 
     <!-- ====== REJECTED FREE FUNCTIONS ======
-         Internal cache-key helpers and functions returning std types that
-         shiboken cannot marshal (std::optional, std::tuple, std::pair,
-         std::function). -->
-    <rejection class="oclero::qlementine" function-name="appStyle"/>
-
-    <!-- ImageUtils: internal cache key helpers -->
-    <rejection class="" function-name="getColorizedPixmapKey"/>
-    <rejection class="" function-name="getTintedPixmapKey"/>
-
-    <!-- ColorUtils: std::optional<QColor> returns -->
-    <rejection class="" function-name="tryGetColorFromVariantList"/>
-    <rejection class="" function-name="tryGetColorFromRGBAString"/>
-    <rejection class="" function-name="tryGetColorFromHexaString"/>
-    <rejection class="" function-name="tryGetColorFromVariant"/>
-
-    <!-- BadgeUtils: std::pair return -->
-    <rejection class="" function-name="getStatusBadgeSizes"/>
-
-    <!-- PrimitiveUtils: std::tuple return -->
-    <rejection class="" function-name="getMenuLabelAndShortcut"/>
-    <!-- PrimitiveUtils: PixmapMakerFunc (std::function) parameter -->
-    <rejection class="" function-name="updateUncheckableButtonIconPixmap"/>
-    <!-- PrimitiveUtils: QIcon& mutation + QlementineStyle ref -->
-    <rejection class="" function-name="updateCheckIcon"/>
-    <rejection class="" function-name="updateMessageBoxWarningIcon"/>
-    <rejection class="" function-name="updateMessageBoxCriticalIcon"/>
-    <rejection class="" function-name="updateMessageBoxQuestionIcon"/>
-    <rejection class="" function-name="updateMessageBoxInformationIcon"/>
-
-    <!-- StyleUtils: std::tuple return -->
-    <rejection class="" function-name="getHPaddings"/>
-
-    <!-- LayoutUtils: std::tuple returns -->
-    <rejection class="" function-name="getHLayoutProps"/>
-    <rejection class="" function-name="getVLayoutProps"/>
-    <rejection class="" function-name="getFormLayoutProps"/>
-
-    <!-- MenuUtils: std::function parameter -->
-    <rejection class="" function-name="flashAction"/>
+         Shiboken generates broken overload code for namespace-level free
+         functions — it creates overloaded wrappers for every type in the
+         namespace instead of using the declared signature.  These functions
+         are exposed correctly via PyQt6/SIP.  The headers remain included
+         in bindings.h because QlementineStyle.cpp depends on them. -->
+    <rejection class="oclero::qlementine" function-name="*"/>
 
     <!-- ====== REJECTED METHODS: std::function parameters ======
          Shiboken cannot marshal std::function<> types.

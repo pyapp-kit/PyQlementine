@@ -46,44 +46,168 @@ class _Builder(QmakeBuilder):
     def install_project(self, target_dir, *, wheel_tag=None):
         super().install_project(target_dir, wheel_tag=wheel_tag)
         package = Path(target_dir, "PyQt6Qlementine")
-        if os.name != "nt":
-            contents = "from ._qlementine import *\n"
-        else:
-            contents = """\
+
+        # -- __init__.py: types + appStyle at top level ----------------------
+        dll_preamble = ""
+        if os.name == "nt":
+            dll_preamble = """\
 try:
     import PyQt6  # force addition of Qt6/bin to dll_directories
 except ImportError:
     raise ImportError(
         "PyQt6 must be installed in order to use PyQt6Qlementine."
     ) from None
-
-from ._qlementine import *
 del PyQt6
+
 """
-        (package / "__init__.py").write_text(contents)
+        (package / "__init__.py").write_text(
+            dll_preamble + _INIT_PY.format(ext="_qlementine")
+        )
 
-        # rename _qlementine.pyi to __init__.pyi
-        stubs = package / "_qlementine.pyi"
-        stubs = stubs.rename(package / "__init__.pyi")
+        # -- utils.py: all free functions ------------------------------------
+        (package / "utils.py").write_text(
+            _UTILS_PY.format(ext="_qlementine")
+        )
 
-        # fix some errors in the stubs
-        stubs_src = stubs.read_text()
-        # replace erroneous [...*] syntax
+        # -- stubs -----------------------------------------------------------
+        raw_pyi = package / "_qlementine.pyi"
+        stubs_src = raw_pyi.read_text()
+        raw_pyi.unlink()
+
+        # fix known SIP stub bugs
         stubs_src = stubs_src.replace("*]", "]")
         stubs_src = stubs_src.replace(" Any", " typing.Any")
-        # remove all of the ` = ...  # type: ` enum type hints
         stubs_src = re.sub(r"=\s*\.\.\.\s*#\s*type:\s*\S+", "= ...", stubs_src)
 
-        stubs.write_text(stubs_src)
-        if shutil.which("ruff"):
-            import subprocess
+        init_pyi, utils_pyi = _split_stubs(stubs_src)
+        (package / "__init__.pyi").write_text(init_pyi)
+        (package / "utils.pyi").write_text(utils_pyi)
 
-            subprocess.run(
-                ["ruff", "check", str(stubs), "--fix-only", "--select", "E,F,W,I,TC"]
-            )
-            subprocess.run(["ruff", "format", str(stubs), "--line-length", "110"])
-
+        _run_ruff(package / "__init__.pyi")
+        _run_ruff(package / "utils.pyi")
         (package / "py.typed").touch()
+
+
+# Template for __init__.py — types and promoted functions only.
+# {ext} is the C extension module name (_qlementine or PySide6Qlementine).
+_INIT_PY = """\
+def _init():
+    import types
+    from . import {ext} as _ql
+
+    ns = globals()
+    _promoted = frozenset({{"appStyle"}})
+    for name in dir(_ql):
+        if name.startswith("_"):
+            continue
+        obj = getattr(_ql, name)
+        if not isinstance(obj, types.BuiltinFunctionType) or name in _promoted:
+            ns[name] = obj
+
+_init()
+del _init
+
+from . import utils as utils
+"""
+
+# Template for utils.py — free functions only.
+_UTILS_PY = """\
+\"\"\"Qlementine utility functions.\"\"\"
+def _init():
+    import types
+    from . import {ext} as _ql
+
+    ns = globals()
+    for name in dir(_ql):
+        if name.startswith("_"):
+            continue
+        obj = getattr(_ql, name)
+        if isinstance(obj, types.BuiltinFunctionType):
+            ns[name] = obj
+
+_init()
+del _init
+"""
+
+
+def _split_stubs(content: str) -> tuple[str, str]:
+    """Split a flat .pyi into (__init__.pyi, utils.pyi).
+
+    Classes/enums/imports + ``appStyle`` go to __init__.pyi.
+    All other top-level ``def`` blocks go to utils.pyi.
+    """
+    lines = content.split("\n")
+    init_lines: list[str] = []
+    utils_lines: list[str] = []
+
+    # Pending decorator lines that precede a def
+    pending_decorators: list[str] = []
+
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+
+        if line.startswith("@"):
+            # Collect decorator — destination depends on the following def
+            pending_decorators.append(line)
+            i += 1
+        elif line.startswith("def "):
+            # Collect full function block (may span multiple lines)
+            block = [line]
+            i += 1
+            while i < len(lines) and lines[i].startswith((" ", "\t")):
+                block.append(lines[i])
+                i += 1
+
+            func_name = line.split("(")[0].removeprefix("def ").strip()
+            if func_name == "appStyle":
+                init_lines.extend(pending_decorators)
+                init_lines.extend(block)
+            else:
+                utils_lines.extend(pending_decorators)
+                utils_lines.extend(block)
+            pending_decorators.clear()
+        else:
+            # Flush any stray decorators (shouldn't happen, but be safe)
+            init_lines.extend(pending_decorators)
+            pending_decorators.clear()
+            init_lines.append(line)
+            i += 1
+
+    # utils.pyi needs the same import header plus re-import of our types
+    # Find the end of the import block in init
+    header: list[str] = []
+    for ln in init_lines:
+        if ln.startswith(("import ", "from ", "#", "try:", "    ", "except")):
+            header.append(ln)
+        elif ln.strip() == "" and header:
+            header.append(ln)
+        else:
+            break
+
+    utils_header = "\n".join(header).rstrip() + "\n\nfrom . import *\n\n"
+    init_pyi = "\n".join(init_lines)
+    utils_pyi = utils_header + "\n".join(utils_lines) + "\n"
+
+    # Add utils re-export to init
+    init_pyi = init_pyi.rstrip() + "\n\nfrom . import utils as utils\n"
+
+    return init_pyi, utils_pyi
+
+
+def _run_ruff(path: Path) -> None:
+    if not shutil.which("ruff"):
+        return
+    import subprocess
+
+    subprocess.run(
+        ["ruff", "check", str(path), "--fix-only", "--select", "E,F,W,I,TC"],
+        check=False,
+    )
+    subprocess.run(
+        ["ruff", "format", str(path), "--line-length", "110"],
+        check=False,
+    )
 
 
 class PyQt6Qlementine(PyQtProject):
