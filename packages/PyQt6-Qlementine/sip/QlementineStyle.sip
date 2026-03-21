@@ -61,6 +61,189 @@ public:
         const QSize& size = QSize(16, 16),
         ColorRole role = oclero::qlementine::ColorRole::Secondary) const;
 
+    // Extended QStyle methods.
+    virtual void drawPrimitiveExt(
+        PrimitiveElementExt pe, const QStyleOption* opt, QPainter* p,
+        const QWidget* w = nullptr) const;
+    virtual QIcon standardIconExt(
+        StandardPixmapExt sp, const QStyleOption* opt = nullptr,
+        const QWidget* w = nullptr) const;
+    virtual QSize sizeFromContentsExt(
+        ContentsTypeExt ct, const QStyleOption* opt, const QSize& s,
+        const QWidget* w = nullptr) const;
+    virtual void drawControlExt(
+        ControlElementExt ce, const QStyleOption* opt, QPainter* p,
+        const QWidget* w = nullptr) const;
+    virtual int pixelMetricExt(
+        PixelMetricExt m, const QStyleOption* opt = nullptr,
+        const QWidget* w = nullptr) const;
+
+    // Theme color methods.
+    virtual const QColor& color(MouseState mouse, ColorRole role) const;
+    virtual const QColor& frameBackgroundColor(MouseState mouse) const;
+
+    virtual const QColor& buttonBackgroundColor(
+        MouseState mouse, ColorRole role, const QWidget* w = nullptr) const;
+    virtual const QColor& buttonForegroundColor(
+        MouseState mouse, ColorRole role, const QWidget* w = nullptr) const;
+
+    virtual const QColor& toolButtonBackgroundColor(MouseState mouse, ColorRole role) const;
+    virtual const QColor& toolButtonForegroundColor(MouseState mouse, ColorRole role) const;
+    virtual const QColor& toolButtonSeparatorColor(MouseState mouse, ColorRole role) const;
+
+    virtual const QColor& commandButtonBackgroundColor(MouseState mouse, ColorRole role) const;
+    virtual const QColor& commandButtonTextColor(MouseState mouse, ColorRole role) const;
+    virtual const QColor& commandButtonDescriptionColor(MouseState mouse, ColorRole role) const;
+    virtual const QColor& commandButtonIconColor(MouseState mouse, ColorRole role) const;
+
+    virtual const QColor& checkButtonBackgroundColor(MouseState mouse, CheckState checked) const;
+    virtual const QColor& checkButtonForegroundColor(MouseState mouse, CheckState checked) const;
+    virtual const QColor& checkButtonBorderColor(
+        MouseState mouse, FocusState focus, CheckState checked) const;
+
+    virtual const QColor& radioButtonBackgroundColor(MouseState mouse, CheckState checked) const;
+    virtual const QColor& radioButtonForegroundColor(MouseState mouse, CheckState checked) const;
+    virtual const QColor& radioButtonBorderColor(
+        MouseState mouse, FocusState focus, CheckState checked) const;
+
+    virtual const QColor& comboBoxBackgroundColor(MouseState mouse) const;
+    virtual const QColor& comboBoxForegroundColor(MouseState mouse) const;
+    virtual const QColor& comboBoxTextColor(
+        MouseState mouse, Status status, const QWidget* w = nullptr) const;
+
+    virtual const QColor& spinBoxBackgroundColor(MouseState mouse) const;
+    virtual const QColor& spinBoxBorderColor(MouseState mouse, FocusState focus) const;
+    virtual const QColor& spinBoxButtonBackgroundColor(MouseState mouse) const;
+    virtual const QColor& spinBoxButtonForegroundColor(MouseState mouse) const;
+
+    virtual const QColor& listItemRowBackgroundColor(
+        MouseState mouse, AlternateState alternate) const;
+    virtual QColor listItemBackgroundColor(
+        MouseState mouse, SelectionState selected, FocusState focus,
+        ActiveState active, const QModelIndex& index,
+        const QWidget* widget = nullptr) const;
+    virtual const QColor& listItemForegroundColor(
+        MouseState mouse, SelectionState selected, FocusState focus,
+        ActiveState active) const;
+    virtual AutoIconColor listItemAutoIconColor(
+        MouseState mouse, SelectionState selected, FocusState focus,
+        ActiveState active, const QModelIndex& index,
+        const QWidget* widget = nullptr) const;
+    virtual const QColor& listItemCaptionForegroundColor(
+        MouseState mouse, SelectionState selected, FocusState focus,
+        ActiveState active) const;
+    virtual const QColor& listItemCheckButtonBackgroundColor(
+        MouseState mouse, CheckState checked, SelectionState selected,
+        ActiveState active) const;
+    virtual const QColor& listItemCheckButtonBorderColor(
+        MouseState mouse, CheckState checked, SelectionState selected,
+        ActiveState active) const;
+    virtual const QColor& listItemCheckButtonForegroundColor(
+        MouseState mouse, CheckState checked, SelectionState selected,
+        ActiveState active) const;
+    virtual const QColor& cellItemFocusBorderColor(
+        FocusState focus, SelectionState selected, ActiveState active) const;
+
+    virtual const QColor& menuBackgroundColor() const;
+    virtual const QColor& menuBorderColor() const;
+    virtual const QColor& menuSeparatorColor() const;
+
+    virtual const QColor& menuItemBackgroundColor(MouseState mouse) const;
+    virtual const QColor& menuItemForegroundColor(MouseState mouse) const;
+    virtual const QColor& menuItemSecondaryForegroundColor(MouseState mouse) const;
+
+    virtual const QColor& menuBarBackgroundColor() const;
+    virtual const QColor& menuBarBorderColor() const;
+    virtual const QColor& menuBarItemBackgroundColor(
+        MouseState mouse, SelectionState selected) const;
+    virtual const QColor& menuBarItemForegroundColor(
+        MouseState mouse, SelectionState selected) const;
+
+    virtual const QColor& tabBarBackgroundColor(MouseState mouse) const;
+    virtual const QColor& tabBarShadowColor() const;
+    virtual const QColor& tabBarBottomShadowColor() const;
+    virtual const QColor& tabBackgroundColor(MouseState mouse, SelectionState selected) const;
+    virtual const QColor& tabForegroundColor(MouseState mouse, SelectionState selected) const;
+    virtual QColor tabTextColor(
+        MouseState mouse, SelectionState selected,
+        const QStyleOptionTab* optTab, const QWidget* w = nullptr) const;
+    virtual const QColor& tabCloseButtonBackgroundColor(
+        MouseState mouse, SelectionState selected) const;
+    virtual const QColor& tabCloseButtonForegroundColor(
+        MouseState mouse, SelectionState selected) const;
+    virtual const QColor& tabBarScrollButtonBackgroundColor(MouseState mouse) const;
+
+    virtual const QColor& progressBarGrooveColor(MouseState mouse) const;
+    virtual const QColor& progressBarValueColor(MouseState mouse) const;
+
+    virtual const QColor& textFieldBackgroundColor(MouseState mouse, Status status) const;
+    virtual const QColor& textFieldBorderColor(
+        MouseState mouse, FocusState focus, Status status) const;
+    virtual const QColor& textFieldForegroundColor(MouseState mouse) const;
+
+    virtual const QColor& sliderGrooveColor(MouseState mouse) const;
+    virtual const QColor& sliderValueColor(MouseState mouse) const;
+    virtual const QColor& sliderHandleColor(MouseState mouse) const;
+    virtual const QColor& sliderTickColor(MouseState mouse) const;
+
+    virtual const QColor& dialHandleColor(MouseState mouse) const;
+    virtual const QColor& dialGrooveColor(MouseState mouse) const;
+    virtual const QColor& dialValueColor(MouseState mouse) const;
+    virtual const QColor& dialTickColor(MouseState mouse) const;
+    virtual const QColor& dialMarkColor(MouseState mouse) const;
+    virtual const QColor& dialBackgroundColor(MouseState mouse) const;
+
+    virtual const QColor& labelForegroundColor(
+        MouseState mouse, const QWidget* w = nullptr) const;
+    virtual const QColor& labelCaptionForegroundColor(MouseState mouse) const;
+
+    virtual const QColor& iconForegroundColor(MouseState mouse, ColorRole role) const;
+
+    virtual const QColor& toolBarBackgroundColor() const;
+    virtual const QColor& toolBarBorderColor() const;
+    virtual const QColor& toolBarSeparatorColor() const;
+
+    virtual const QColor& toolTipBackgroundColor() const;
+    virtual const QColor& toolTipBorderColor() const;
+    virtual const QColor& toolTipForegroundColor() const;
+
+    virtual const QColor& scrollBarGrooveColor(MouseState mouse) const;
+    virtual const QColor& scrollBarHandleColor(MouseState mouse) const;
+    virtual int getScrollBarThickness(MouseState mouse) const;
+
+    virtual const QColor& groupBoxTitleColor(
+        MouseState mouse, const QWidget* w = nullptr) const;
+    virtual const QColor& groupBoxBorderColor(MouseState mouse) const;
+    virtual QColor groupBoxBackgroundColor(MouseState mouse) const;
+
+    virtual const QColor& statusColor(Status status, MouseState mouse) const;
+    virtual const QColor& statusColorForeground(Status status, MouseState mouse) const;
+    virtual QColor focusBorderColor(Status status) const;
+    virtual const QColor& frameBorderColor() const;
+    virtual const QColor& separatorColor() const;
+
+    virtual const QColor& colorForTextRole(TextRole role, MouseState mouse) const;
+    virtual int pixelSizeForTextRole(TextRole role) const;
+    virtual const QFont& fontForTextRole(TextRole role) const;
+    virtual QPalette paletteForTextRole(TextRole role) const;
+
+    virtual const QColor& switchGrooveColor(MouseState mouse, CheckState checked) const;
+    virtual const QColor& switchGrooveBorderColor(
+        MouseState mouse, FocusState focus, CheckState checked) const;
+    virtual const QColor& switchHandleColor(MouseState mouse, CheckState checked) const;
+
+    virtual const QColor& tableHeaderBgColor(MouseState mouse, CheckState checked) const;
+    virtual const QColor& tableHeaderFgColor(MouseState mouse, CheckState checked) const;
+    virtual const QColor& tableLineColor() const;
+
+    virtual Status widgetStatus(const QWidget* widget) const;
+
+    virtual const QColor& statusBarBackgroundColor() const;
+    virtual const QColor& statusBarBorderColor() const;
+    virtual const QColor& statusBarSeparatorColor() const;
+
+    virtual const QColor& splitterColor(MouseState mouse) const;
+
 signals:
     void themeChanged();
     void animationsEnabledChanged();

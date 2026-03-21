@@ -172,6 +172,15 @@
                 <modify-function signature="unpolish(QWidget*)"/>
                 <modify-function signature="unpolish(QApplication*)" remove="all"/>
 
+                <!-- Extended QStyle virtual methods -->
+                <modify-function signature="drawPrimitiveExt(oclero::qlementine::QlementineStyle::PrimitiveElementExt,const QStyleOption*,QPainter*,const QWidget*)const"
+                                 allow-thread="yes"/>
+                <modify-function signature="drawControlExt(oclero::qlementine::QlementineStyle::ControlElementExt,const QStyleOption*,QPainter*,const QWidget*)const"
+                                 allow-thread="yes"/>
+                <modify-function signature="standardIconExt(oclero::qlementine::QlementineStyle::StandardPixmapExt,const QStyleOption*,const QWidget*)const"/>
+                <modify-function signature="sizeFromContentsExt(oclero::qlementine::QlementineStyle::ContentsTypeExt,const QStyleOption*,const QSize&amp;,const QWidget*)const"/>
+                <modify-function signature="pixelMetricExt(oclero::qlementine::QlementineStyle::PixelMetricExt,const QStyleOption*,const QWidget*)const"/>
+
                 <!-- Qlementine-specific public method -->
                 <modify-function signature="widgetStatus(const QWidget*)const"/>
             </object-type>
