@@ -68,6 +68,11 @@ public:
         const QSize& size = QSize(16, 16),
         ColorRole role = oclero::qlementine::ColorRole::Secondary) const;
 
+    QIcon makeThemedIconFromData(
+        const QByteArray& svgData,
+        const QSize& size = QSize(16, 16),
+        ColorRole role = oclero::qlementine::ColorRole::Secondary) const;
+
     // Extended QStyle methods.
     virtual void drawPrimitiveExt(
         PrimitiveElementExt pe, const QStyleOption* opt, QPainter* p,

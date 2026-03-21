@@ -19,6 +19,8 @@
     <rejection class="" function-name="getBlurredPixmap"/>
     <rejection class="" function-name="getDropShadowPixmap"/>
     <rejection class="" function-name="blurRadiusNecessarySpace"/>
+    <rejection class="" function-name="makeIconFromSvg"/>
+    <rejection class="" function-name="makeIconFromSvgData"/>
     <rejection class="" function-name="getContrastRatio"/>
     <rejection class="" function-name="colorWithAlphaF"/>
     <rejection class="" function-name="colorWithAlpha"/>
