@@ -67,7 +67,6 @@ before-build = "uvx --from aqtinstall==3.2.0 aqt install-qt windows desktop %QT_
 [tool.ruff]
 line-length = 88
 target-version = "py39"
-src = ["src", "tests"]
 fix = true
 unsafe-fixes = true
 

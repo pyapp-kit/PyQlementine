@@ -5,7 +5,6 @@ from __future__ import annotations
 import inspect
 
 import pytest
-
 from _qt_compat import Qlementine, QtCore, QTimer, QtWidgets
 
 QlementineStyle = Qlementine.QlementineStyle
