@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from _qt_compat import QColor, Qlementine, QSize
+import pytest
+from _qt_compat import QColor, QJsonDocument, Qlementine, QSize
 
 THEMES_DIR = Path(__file__).parent / "themes"
 
@@ -129,18 +130,11 @@ def test_theme_from_json_path_dark(qapp):
 
 
 def test_theme_from_json_path_nonexistent(qapp):
-    import pytest
-
     with pytest.raises(ValueError, match="Failed to load theme"):
         Theme.fromJsonPath("/nonexistent/path.json")
 
 
 def test_theme_from_json_doc_with_fixture(qapp):
-    try:
-        from PyQt6.QtCore import QJsonDocument
-    except ImportError:
-        from PySide6.QtCore import QJsonDocument
-
     path = THEMES_DIR / "light.json"
     doc = QJsonDocument.fromJson(path.read_bytes())
     t = Theme.fromJsonDoc(doc)

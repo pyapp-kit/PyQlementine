@@ -11,6 +11,8 @@
 // Core types
 #include <oclero/qlementine/Common.hpp>
 #include <oclero/qlementine/utils/RadiusesF.hpp>
+#include <oclero/qlementine/utils/IconUtils.hpp>
+#include <oclero/qlementine/utils/ImageUtils.hpp>
 
 // Style
 #include <oclero/qlementine/style/Theme.hpp>

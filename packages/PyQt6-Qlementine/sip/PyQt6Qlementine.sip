@@ -9,6 +9,9 @@
 %Include Common.sip
 %Include RadiusesF.sip
 %Include Theme.sip
+%Include IconTheme.sip
+%Include IconUtils.sip
+%Include ImageUtils.sip
 %Include QlementineStyle.sip
 %Include ThemeManager.sip
 %Include RoundedFocusFrame.sip

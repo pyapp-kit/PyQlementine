@@ -10,13 +10,8 @@
          overload code or operate on types not exposed in our bindings. -->
     <rejection class="oclero::qlementine" function-name="appStyle"/>
     <rejection class="" function-name="colorizeImage"/>
-    <rejection class="" function-name="colorizePixmap"/>
-    <rejection class="" function-name="tintPixmap"/>
-    <rejection class="" function-name="getColorizedPixmap"/>
     <rejection class="" function-name="getColorizedPixmapKey"/>
-    <rejection class="" function-name="getTintedPixmap"/>
     <rejection class="" function-name="getTintedPixmapKey"/>
-    <rejection class="" function-name="makePixmapFromSvg"/>
     <rejection class="" function-name="makeRoundedPixmap"/>
     <rejection class="" function-name="makeFitPixmap"/>
     <rejection class="" function-name="getImageAspectRatio"/>
@@ -47,7 +42,6 @@
     <rejection class="oclero::qlementine::Popover" function-name="setManualPositioningCallback"/>
 
     <!-- ====== REJECTED METHODS: internal ====== -->
-    <rejection class="oclero::qlementine::QlementineStyle" function-name="getColorizedPixmap"/>
     <rejection class="oclero::qlementine::AbstractItemListWidget" function-name="initStyleOptionFocus"/>
     <rejection class="oclero::qlementine::CommandLinkButton" function-name="initStyleOption"/>
 
@@ -66,7 +60,6 @@
     <rejection class="oclero::qlementine::ComboBoxDelegate"/>
     <rejection class="oclero::qlementine::Action"/>
     <rejection class="oclero::qlementine::FramelessWindow"/>
-    <rejection class="oclero::qlementine::IconTheme"/>
 
     <namespace-type name="oclero" visible="false">
         <namespace-type name="qlementine" visible="false">
@@ -90,6 +83,7 @@
 
             <!-- ====== VALUE TYPES ====== -->
 
+            <value-type name="IconTheme"/>
             <value-type name="RadiusesF"/>
             <value-type name="ThemeMeta"/>
             <value-type name="Theme">
@@ -129,10 +123,6 @@
                 <enum-type name="ContentsTypeExt"/>
                 <enum-type name="PixelMetricExt"/>
                 <enum-type name="PrimitiveElementExt"/>
-
-                <!-- Per-widget overloads not exposed -->
-                <modify-function signature="setAutoIconColor(QWidget*,oclero::qlementine::AutoIconColor)" remove="all"/>
-                <modify-function signature="autoIconColor(const QWidget*)const" remove="all"/>
 
                 <!-- ====== QStyle/QProxyStyle virtual overrides ======
                      These MUST be declared so Shiboken generates the virtual

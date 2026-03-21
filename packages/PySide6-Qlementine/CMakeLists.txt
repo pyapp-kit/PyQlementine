@@ -148,6 +148,7 @@ set(WRAPPER_SOURCES
     ${GENERATED_DIR}/oclero_qlementine_coloreditor_wrapper.cpp
     ${GENERATED_DIR}/oclero_qlementine_commandlinkbutton_wrapper.cpp
     ${GENERATED_DIR}/oclero_qlementine_expander_wrapper.cpp
+    ${GENERATED_DIR}/oclero_qlementine_icontheme_wrapper.cpp
     ${GENERATED_DIR}/oclero_qlementine_iconwidget_wrapper.cpp
     ${GENERATED_DIR}/oclero_qlementine_label_wrapper.cpp
     ${GENERATED_DIR}/oclero_qlementine_lineedit_wrapper.cpp

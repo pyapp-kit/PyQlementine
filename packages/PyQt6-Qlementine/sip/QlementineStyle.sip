@@ -53,6 +53,13 @@ public:
     void setAutoIconColor(AutoIconColor autoIconColor);
     AutoIconColor autoIconColor() const;
 
+    static void setAutoIconColor(QWidget* widget, AutoIconColor autoIconColor);
+    AutoIconColor autoIconColor(const QWidget* widget) const;
+
+    QPixmap getColorizedPixmap(
+        const QPixmap& input, AutoIconColor autoIconColor,
+        const QColor& fgcolor, const QColor& textColor) const;
+
     QIcon makeThemedIcon(
         const QString& svgPath,
         const QSize& size = QSize(16, 16),
