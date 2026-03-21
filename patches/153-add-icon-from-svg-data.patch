@@ -1,15 +1,3 @@
-From faf40fb1081766b53f9225796d87aafdb5e39ab4 Mon Sep 17 00:00:00 2001
-From: Talley Lambert <talley.lambert@gmail.com>
-Date: Sat, 21 Mar 2026 12:33:15 -0400
-Subject: [PATCH] Add methods to create icons from SVG data in memory
-
----
- .../qlementine/style/QlementineStyle.hpp      |  3 +
- .../oclero/qlementine/utils/IconUtils.hpp     |  7 +++
- lib/src/style/QlementineStyle.cpp             |  5 ++
- lib/src/utils/IconUtils.cpp                   | 60 +++++++++++++++++++
- 4 files changed, 75 insertions(+)
-
 diff --git a/lib/include/oclero/qlementine/style/QlementineStyle.hpp b/lib/include/oclero/qlementine/style/QlementineStyle.hpp
 index a60ed25..b3ec921 100644
 --- a/lib/include/oclero/qlementine/style/QlementineStyle.hpp
@@ -17,13 +5,13 @@ index a60ed25..b3ec921 100644
 @@ -76,6 +76,9 @@ public:
    QIcon makeThemedIconFromName(
      const QString& name, const QSize& size = QSize(16, 16), ColorRole role = ColorRole::Secondary) const;
-
+ 
 +  QIcon makeThemedIconFromData(
 +    const QByteArray& svgData, const QSize& size = QSize(16, 16), ColorRole role = ColorRole::Secondary) const;
 +
    // Allows to customize quickly the way QlementineStyle gets its icons. SVG paths preferred.
    void setIconPathGetter(const std::function<QString(QString)>& func);
-
+ 
 diff --git a/lib/include/oclero/qlementine/utils/IconUtils.hpp b/lib/include/oclero/qlementine/utils/IconUtils.hpp
 index f8344c9..77b9238 100644
 --- a/lib/include/oclero/qlementine/utils/IconUtils.hpp
@@ -47,7 +35,7 @@ index a76bb48..4dff54d 100644
 @@ -377,6 +377,11 @@ QIcon QlementineStyle::makeThemedIconFromName(const QString& name, const QSize&
    }
  }
-
+ 
 +QIcon QlementineStyle::makeThemedIconFromData(const QByteArray& svgData, const QSize& size, ColorRole role) const {
 +  const auto iconTheme = _impl->iconThemeFromTheme(role);
 +  return makeIconFromSvgData(svgData, iconTheme, size);
@@ -61,7 +49,7 @@ index cc33a6d..58d3c19 100644
 --- a/lib/src/utils/IconUtils.cpp
 +++ b/lib/src/utils/IconUtils.cpp
 @@ -92,4 +92,64 @@ QIcon makeIconFromSvg(const QString& svgPath, const IconTheme& iconTheme, const
-
+ 
    return icon;
  }
 +
@@ -125,5 +113,3 @@ index cc33a6d..58d3c19 100644
 +  return icon;
 +}
  } // namespace oclero::qlementine
---
-2.52.0
