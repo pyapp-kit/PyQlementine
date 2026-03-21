@@ -10,6 +10,8 @@ class QlementineStyle : QCommonStyle
 
 %TypeHeaderCode
 #include <oclero/qlementine/style/QlementineStyle.hpp>
+#include <functional>
+#include <memory>
 %End
 
 public:
@@ -65,6 +67,53 @@ public:
         const QByteArray& svgData,
         const QSize& size = QSize(16, 16),
         ColorRole role = oclero::qlementine::ColorRole::Secondary) const;
+
+    // Icon path getter: accepts a Python callable (str) -> str, or None.
+    void setIconPathGetter(SIP_PYCALLABLE /AllowNone/);
+%MethodCode
+    if (a0 == Py_None) {
+        sipCpp->setIconPathGetter(std::function<QString(QString)>{});
+    } else {
+        // prevent GC; release when the std::function is destroyed
+        Py_INCREF(a0);
+        auto ref = std::shared_ptr<PyObject>(a0, [](PyObject* p) {
+            if (Py_IsInitialized()) {
+                PyGILState_STATE gil = PyGILState_Ensure();
+                Py_DECREF(p);
+                PyGILState_Release(gil);
+            }
+        });
+
+        sipCpp->setIconPathGetter([ref](const QString& name) -> QString {
+            PyGILState_STATE gil = PyGILState_Ensure();
+
+            PyObject* pyName = PyUnicode_FromString(
+                name.toUtf8().constData());
+            PyObject* result = PyObject_CallFunctionObjArgs(
+                ref.get(), pyName, nullptr);
+            Py_DECREF(pyName);
+
+            QString out;
+            if (result) {
+                PyObject* strResult = PyObject_Str(result);
+                if (strResult) {
+                    PyObject* bytes = PyUnicode_AsUTF8String(strResult);
+                    if (bytes) {
+                        out = QString::fromUtf8(PyBytes_AsString(bytes));
+                        Py_DECREF(bytes);
+                    }
+                    Py_DECREF(strResult);
+                }
+                Py_DECREF(result);
+            } else {
+                PyErr_Print();
+            }
+
+            PyGILState_Release(gil);
+            return out;
+        });
+    }
+%End
 
     // Extended QStyle methods.
     virtual void drawPrimitiveExt(

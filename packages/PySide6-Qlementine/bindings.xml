@@ -40,8 +40,8 @@
     <rejection class="" function-name="drawStatusBadge"/>
 
     <!-- ====== REJECTED METHODS: std::function parameters ======
-         Shiboken cannot marshal std::function<> types. -->
-    <rejection class="oclero::qlementine::QlementineStyle" function-name="setIconPathGetter"/>
+         Shiboken cannot marshal std::function<> types.
+         setIconPathGetter is handled via add-function + inject-code below. -->
     <rejection class="oclero::qlementine::Menu" function-name="setEnabledPredicate"/>
     <rejection class="oclero::qlementine::Menu" function-name="setVisiblePredicate"/>
     <rejection class="oclero::qlementine::Popover" function-name="setManualPositioningCallback"/>
@@ -184,6 +184,15 @@
 
                 <!-- Qlementine-specific public method -->
                 <modify-function signature="widgetStatus(const QWidget*)const"/>
+
+                <!-- setIconPathGetter: accept a Python callable (or None) and
+                     wrap it in a C++ std::function<QString(QString)>.
+                     A shared_ptr prevents the callable from being GC'd and
+                     ensures it is properly DECREF'd when the std::function
+                     is destroyed (style destruction or replacement). -->
+                <add-function signature="setIconPathGetter(PyObject* @func@)">
+                    <inject-code class="target" position="beginning" file="glue/seticonpathgetter.cpp"/>
+                </add-function>
             </object-type>
 
             <object-type name="ThemeManager"/>

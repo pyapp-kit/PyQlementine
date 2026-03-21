@@ -4,6 +4,10 @@
 // Qt types needed by shiboken to resolve all QStyle virtual overload signatures
 #include <QApplication>
 
+// Used by setIconPathGetter glue code
+#include <functional>
+#include <memory>
+
 // Core types
 #include <oclero/qlementine/Common.hpp>
 #include <oclero/qlementine/utils/RadiusesF.hpp>
