@@ -1,0 +1,129 @@
+From faf40fb1081766b53f9225796d87aafdb5e39ab4 Mon Sep 17 00:00:00 2001
+From: Talley Lambert <talley.lambert@gmail.com>
+Date: Sat, 21 Mar 2026 12:33:15 -0400
+Subject: [PATCH] Add methods to create icons from SVG data in memory
+
+---
+ .../qlementine/style/QlementineStyle.hpp      |  3 +
+ .../oclero/qlementine/utils/IconUtils.hpp     |  7 +++
+ lib/src/style/QlementineStyle.cpp             |  5 ++
+ lib/src/utils/IconUtils.cpp                   | 60 +++++++++++++++++++
+ 4 files changed, 75 insertions(+)
+
+diff --git a/lib/include/oclero/qlementine/style/QlementineStyle.hpp b/lib/include/oclero/qlementine/style/QlementineStyle.hpp
+index a60ed25..b3ec921 100644
+--- a/lib/include/oclero/qlementine/style/QlementineStyle.hpp
++++ b/lib/include/oclero/qlementine/style/QlementineStyle.hpp
+@@ -76,6 +76,9 @@ public:
+   QIcon makeThemedIconFromName(
+     const QString& name, const QSize& size = QSize(16, 16), ColorRole role = ColorRole::Secondary) const;
+
++  QIcon makeThemedIconFromData(
++    const QByteArray& svgData, const QSize& size = QSize(16, 16), ColorRole role = ColorRole::Secondary) const;
++
+   // Allows to customize quickly the way QlementineStyle gets its icons. SVG paths preferred.
+   void setIconPathGetter(const std::function<QString(QString)>& func);
+
+diff --git a/lib/include/oclero/qlementine/utils/IconUtils.hpp b/lib/include/oclero/qlementine/utils/IconUtils.hpp
+index f8344c9..77b9238 100644
+--- a/lib/include/oclero/qlementine/utils/IconUtils.hpp
++++ b/lib/include/oclero/qlementine/utils/IconUtils.hpp
+@@ -26,4 +26,11 @@ struct IconTheme {
+ /// Makes an icon from the file located at the path in parameter and colorizes the QPixmaps. Fixes the standard Qt behavior.
+ [[maybe_unused]] QIcon makeIconFromSvg(
+   const QString& svgPath, const IconTheme& iconTheme, const QSize& size = QSize(16, 16));
++
++/// Makes an icon from SVG data in memory. Fixes the standard Qt behavior.
++[[maybe_unused]] QIcon makeIconFromSvgData(const QByteArray& svgData, const QSize& size);
++
++/// Makes an icon from SVG data in memory and colorizes the QPixmaps. Fixes the standard Qt behavior.
++[[maybe_unused]] QIcon makeIconFromSvgData(
++  const QByteArray& svgData, const IconTheme& iconTheme, const QSize& size = QSize(16, 16));
+ } // namespace oclero::qlementine
+diff --git a/lib/src/style/QlementineStyle.cpp b/lib/src/style/QlementineStyle.cpp
+index a76bb48..4dff54d 100644
+--- a/lib/src/style/QlementineStyle.cpp
++++ b/lib/src/style/QlementineStyle.cpp
+@@ -377,6 +377,11 @@ QIcon QlementineStyle::makeThemedIconFromName(const QString& name, const QSize&
+   }
+ }
+
++QIcon QlementineStyle::makeThemedIconFromData(const QByteArray& svgData, const QSize& size, ColorRole role) const {
++  const auto iconTheme = _impl->iconThemeFromTheme(role);
++  return makeIconFromSvgData(svgData, iconTheme, size);
++}
++
+ void QlementineStyle::setIconPathGetter(const std::function<QString(QString)>& func) {
+   _impl->iconPathFunc = func;
+ }
+diff --git a/lib/src/utils/IconUtils.cpp b/lib/src/utils/IconUtils.cpp
+index cc33a6d..58d3c19 100644
+--- a/lib/src/utils/IconUtils.cpp
++++ b/lib/src/utils/IconUtils.cpp
+@@ -92,4 +92,64 @@ QIcon makeIconFromSvg(const QString& svgPath, const IconTheme& iconTheme, const
+
+   return icon;
+ }
++
++QIcon makeIconFromSvgData(const QByteArray& svgData, const QSize& size) {
++  if (svgData.isEmpty() || size.isEmpty())
++    return {};
++
++  QIcon icon;
++
++  QSvgRenderer svgRenderer(svgData);
++  svgRenderer.setAspectRatioMode(Qt::AspectRatioMode::KeepAspectRatio);
++
++  for (const auto pxRatio : { 1., 2. }) {
++    QPixmap pixmap(size * pxRatio);
++    pixmap.fill(Qt::transparent);
++    {
++      QPainter painter(&pixmap);
++      painter.setRenderHint(QPainter::Antialiasing, true);
++      svgRenderer.render(&painter, pixmap.rect());
++    }
++    pixmap.setDevicePixelRatio(pxRatio);
++
++    for (const auto iconMode : { QIcon::Normal, QIcon::Disabled, QIcon::Active, QIcon::Selected }) {
++      for (const auto iconState : { QIcon::On, QIcon::Off }) {
++        icon.addPixmap(pixmap, iconMode, iconState);
++      }
++    }
++  }
++
++  return icon;
++}
++
++QIcon makeIconFromSvgData(const QByteArray& svgData, const IconTheme& iconTheme, const QSize& size) {
++  if (svgData.isEmpty() || size.isEmpty())
++    return {};
++
++  QIcon icon;
++
++  QSvgRenderer svgRenderer(svgData);
++  svgRenderer.setAspectRatioMode(Qt::AspectRatioMode::KeepAspectRatio);
++
++  for (const auto pxRatio : { 1, 2 }) {
++    QPixmap pixmap(size * pxRatio);
++    pixmap.fill(Qt::transparent);
++    {
++      QPainter painter(&pixmap);
++      painter.setRenderHint(QPainter::Antialiasing, true);
++      svgRenderer.render(&painter, pixmap.rect());
++    }
++    pixmap.setDevicePixelRatio(static_cast<double>(pxRatio));
++
++    for (const auto iconMode : { QIcon::Normal, QIcon::Disabled, QIcon::Active, QIcon::Selected }) {
++      for (const auto iconState : { QIcon::On, QIcon::Off }) {
++        const auto& fgColor = iconTheme.color(iconMode, iconState);
++        const auto coloredPixmap = qlementine::getColorizedPixmap(pixmap, fgColor);
++        icon.addPixmap(coloredPixmap, iconMode, iconState);
++      }
++    }
++  }
++
++  return icon;
++}
+ } // namespace oclero::qlementine
+--
+2.52.0
