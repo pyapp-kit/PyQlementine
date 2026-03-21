@@ -14,8 +14,7 @@ void drawEllipseBorder(QPainter* p, const QRectF& rect, const QColor& color, qre
 QPainterPath getMultipleRadiusesRectPath(const QRectF& rect, const RadiusesF& radiuses);
 
 void drawRoundedRect(QPainter* p, const QRectF& rect, const QBrush& brush, qreal radius = 0.);
-// SKIPPED: drawRoundedRect(QPainter*, QRectF, QBrush, RadiusesF) - upstream bug:
-//   header declares drawRoundedRect, source defines drawRoundedRectF
+void drawRoundedRect(QPainter* p, const QRectF& rect, const QBrush& brush, const RadiusesF& radiuses);
 void drawRoundedRect(QPainter* p, const QRect& rect, const QBrush& brush, qreal radius = 0.);
 void drawRoundedRect(QPainter* p, const QRect& rect, const QBrush& brush, const RadiusesF& radiuses);
 
