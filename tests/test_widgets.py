@@ -190,7 +190,6 @@ def test_line_edit_status_changed_signal(qtbot: QtBot) -> None:
         le.setStatus(Qlementine.Status.Error)
 
 
-@pytest.mark.xfail(reason="upstream: LineEdit.setIcon does not emit iconChanged")
 def test_line_edit_icon_changed_signal(qtbot: QtBot) -> None:
     le = Qlementine.LineEdit()
     with qtbot.waitSignal(le.iconChanged):
@@ -351,7 +350,6 @@ def test_icon_widget_set_icon_size(qapp: QApplication) -> None:
     assert iw.iconSize() == QSize(32, 32)
 
 
-@pytest.mark.xfail(reason="upstream: IconWidget.setIcon does not emit iconChanged")
 def test_icon_widget_icon_changed_signal(qtbot: QtBot) -> None:
     iw = Qlementine.IconWidget()
     with qtbot.waitSignal(iw.iconChanged):
@@ -460,9 +458,6 @@ def test_notification_badge_foreground_color_changed_signal(qtbot: QtBot) -> Non
         nb.setForegroundColor(QColor(255, 0, 0))
 
 
-@pytest.mark.xfail(
-    reason="upstream: setBackgroundColor emits foregroundColorChanged instead"
-)
 def test_notification_badge_background_color_changed_signal(qtbot: QtBot) -> None:
     nb = Qlementine.NotificationBadge()
     with qtbot.waitSignal(nb.backgroundColorChanged):
@@ -1210,7 +1205,6 @@ def test_segmented_control_current_index_changed_signal(qtbot: QtBot) -> None:
         sc.setCurrentIndex(1)
 
 
-@pytest.mark.xfail(reason="upstream: setCurrentIndex does not emit currentDataChanged")
 def test_segmented_control_current_data_changed_signal(qtbot: QtBot) -> None:
     sc = Qlementine.SegmentedControl()
     sc.addItem("A", itemData="a")
