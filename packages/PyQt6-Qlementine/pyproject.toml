@@ -36,7 +36,7 @@ jobs = 8
 
 [tool.sip.bindings.PyQt6Qlementine]
 pep484-pyi = true
-sip-file = "PyQt6Qlementine.sip"
+sip-file = "_qlementine/PyQt6Qlementine.sip"
 qmake-QT = ["widgets", "svg"]
 include-dirs = [
 	"../../qlementine/lib/include",
@@ -124,3 +124,26 @@ sources = [
 	"../../qlementine/lib/src/widgets/Switch.cpp",
 ]
 
+[tool.sip.bindings.PyQt6QlementineUtils]
+pep484-pyi = true
+sip-file = "_utils/PyQt6QlementineUtils.sip"
+qmake-QT = ["widgets", "svg"]
+include-dirs = [
+	"../../qlementine/lib/include",
+	"../../qlementine/lib/src",
+]
+sources = [
+	"../../qlementine/lib/src/utils/BadgeUtils.cpp",
+	"../../qlementine/lib/src/utils/ColorUtils.cpp",
+	"../../qlementine/lib/src/utils/FontUtils.cpp",
+	"../../qlementine/lib/src/utils/GeometryUtils.cpp",
+	"../../qlementine/lib/src/utils/IconUtils.cpp",
+	"../../qlementine/lib/src/utils/ImageUtils.cpp",
+	"../../qlementine/lib/src/utils/LayoutUtils.cpp",
+	"../../qlementine/lib/src/utils/MenuUtils.cpp",
+	"../../qlementine/lib/src/utils/PrimitiveUtils.cpp",
+	"../../qlementine/lib/src/utils/RadiusesF.cpp",
+	"../../qlementine/lib/src/utils/StateUtils.cpp",
+	"../../qlementine/lib/src/utils/StyleUtils.cpp",
+	"../../qlementine/lib/src/utils/WidgetUtils.cpp",
+]
