@@ -65,40 +65,137 @@ public:
     QColor backgroundColorMain2;
     QColor backgroundColorMain3;
     QColor backgroundColorMain4;
+    QColor backgroundColorMainTransparent;
+
+    QColor backgroundColorWorkspace;
+    QColor backgroundColorTabBar;
+
+    QColor neutralColor;
+    QColor neutralColorHovered;
+    QColor neutralColorPressed;
+    QColor neutralColorDisabled;
+    QColor neutralColorTransparent;
+
+    QColor focusColor;
 
     QColor primaryColor;
     QColor primaryColorHovered;
     QColor primaryColorPressed;
     QColor primaryColorDisabled;
+    QColor primaryColorTransparent;
 
     QColor primaryColorForeground;
+    QColor primaryColorForegroundHovered;
+    QColor primaryColorForegroundPressed;
+    QColor primaryColorForegroundDisabled;
+    QColor primaryColorForegroundTransparent;
+
+    QColor primaryAlternativeColor;
+    QColor primaryAlternativeColorHovered;
+    QColor primaryAlternativeColorPressed;
+    QColor primaryAlternativeColorDisabled;
+    QColor primaryAlternativeColorTransparent;
 
     QColor secondaryColor;
     QColor secondaryColorHovered;
     QColor secondaryColorPressed;
     QColor secondaryColorDisabled;
+    QColor secondaryColorTransparent;
 
     QColor secondaryColorForeground;
+    QColor secondaryColorForegroundHovered;
+    QColor secondaryColorForegroundPressed;
+    QColor secondaryColorForegroundDisabled;
+    QColor secondaryColorForegroundTransparent;
+
+    QColor secondaryAlternativeColor;
+    QColor secondaryAlternativeColorHovered;
+    QColor secondaryAlternativeColorPressed;
+    QColor secondaryAlternativeColorDisabled;
+    QColor secondaryAlternativeColorTransparent;
 
     QColor statusColorSuccess;
+    QColor statusColorSuccessHovered;
+    QColor statusColorSuccessPressed;
+    QColor statusColorSuccessDisabled;
     QColor statusColorInfo;
+    QColor statusColorInfoHovered;
+    QColor statusColorInfoPressed;
+    QColor statusColorInfoDisabled;
     QColor statusColorWarning;
+    QColor statusColorWarningHovered;
+    QColor statusColorWarningPressed;
+    QColor statusColorWarningDisabled;
     QColor statusColorError;
+    QColor statusColorErrorHovered;
+    QColor statusColorErrorPressed;
+    QColor statusColorErrorDisabled;
     QColor statusColorForeground;
+    QColor statusColorForegroundHovered;
+    QColor statusColorForegroundPressed;
+    QColor statusColorForegroundDisabled;
 
-    QColor focusColor;
+    QColor shadowColor1;
+    QColor shadowColor2;
+    QColor shadowColor3;
+    QColor shadowColorTransparent;
+
     QColor borderColor;
+    QColor borderColorHovered;
+    QColor borderColorPressed;
+    QColor borderColorDisabled;
+    QColor borderColorTransparent;
+
+    QColor semiTransparentColor1;
+    QColor semiTransparentColor2;
+    QColor semiTransparentColor3;
+    QColor semiTransparentColor4;
+    QColor semiTransparentColorTransparent;
 
     bool useSystemFonts;
+
     int fontSize;
+    int fontSizeMonospace;
+    int fontSizeH1;
+    int fontSizeH2;
+    int fontSizeH3;
+    int fontSizeH4;
+    int fontSizeH5;
+    int fontSizeS1;
     int animationDuration;
+    int focusAnimationDuration;
+    int sliderAnimationDuration;
     double borderRadius;
+    double checkBoxBorderRadius;
+    double menuItemBorderRadius;
+    double menuBarItemBorderRadius;
     int borderWidth;
     int controlHeightLarge;
     int controlHeightMedium;
     int controlHeightSmall;
-    int spacing;
+    int controlDefaultWidth;
+    int dialMarkLength;
+    int dialMarkThickness;
+    int dialTickLength;
+    int dialTickSpacing;
+    int dialGrooveThickness;
+    int focusBorderWidth;
     QSize iconSize;
+    QSize iconSizeMedium;
+    QSize iconSizeLarge;
+    QSize iconSizeExtraSmall;
+    int sliderTickSize;
+    int sliderTickSpacing;
+    int sliderTickThickness;
+    int sliderGrooveHeight;
+    int progressBarGrooveHeight;
+    int spacing;
+    int scrollBarThicknessFull;
+    int scrollBarThicknessSmall;
+    int scrollBarMargin;
+    int tabBarPaddingTop;
+    int tabBarTabMaxWidth;
+    int tabBarTabMinWidth;
 
     QFont fontRegular;
     QFont fontBold;
