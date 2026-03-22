@@ -12,7 +12,6 @@ set windows-shell := ["powershell.exe", "-NoProfile", "-NoLogo", "-Command"]
 [unix]
 install-pyqt6: _clone install-qt
     uv sync --group pyqt6 --reinstall-package pyqt6-qlementine
-    uv run python -c "from scripts.repair_wheel import fix_installed; fix_installed('PyQt6')"
 
 [windows]
 install-pyqt6: _clone install-qt
@@ -31,7 +30,7 @@ install-pyside6: _clone (install-qt "6.10.2")
 [unix]
 clean:
     rm -rf build dist wheelhouse Qt
-    rm aqtinstall.log
+    rm -f aqtinstall.log
 
 [windows]
 clean:

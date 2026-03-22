@@ -6,12 +6,32 @@
     <load-typesystem name="typesystem_widgets.xml" generate="no"/>
 
     <!-- ====== REJECTED FREE FUNCTIONS ======
-         Shiboken generates broken overload code for namespace-level free
-         functions — it creates overloaded wrappers for every type in the
-         namespace instead of using the declared signature.  These functions
-         are exposed correctly via PyQt6/SIP.  The headers remain included
-         in bindings.h because QlementineStyle.cpp depends on them. -->
-    <rejection class="oclero::qlementine" function-name="*"/>
+         These are internal C++ utilities that either generate broken shiboken
+         overload code or operate on types not exposed in our bindings. -->
+    <rejection class="oclero::qlementine" function-name="appStyle"/>
+    <rejection class="" function-name="colorizeImage"/>
+    <rejection class="" function-name="getColorizedPixmapKey"/>
+    <rejection class="" function-name="getTintedPixmapKey"/>
+    <rejection class="" function-name="makeRoundedPixmap"/>
+    <rejection class="" function-name="makeFitPixmap"/>
+    <rejection class="" function-name="getImageAspectRatio"/>
+    <rejection class="" function-name="getExtendedImage"/>
+    <rejection class="" function-name="getBlurredPixmap"/>
+    <rejection class="" function-name="getDropShadowPixmap"/>
+    <rejection class="" function-name="blurRadiusNecessarySpace"/>
+    <rejection class="" function-name="makeIconFromSvg"/>
+    <rejection class="" function-name="getContrastRatio"/>
+    <rejection class="" function-name="colorWithAlphaF"/>
+    <rejection class="" function-name="colorWithAlpha"/>
+    <rejection class="" function-name="getColorSourceOver"/>
+    <rejection class="" function-name="tryGetColorFromVariantList"/>
+    <rejection class="" function-name="tryGetColorFromRGBAString"/>
+    <rejection class="" function-name="tryGetColorFromHexaString"/>
+    <rejection class="" function-name="tryGetColorFromVariant"/>
+    <rejection class="" function-name="toHexRGB"/>
+    <rejection class="" function-name="toHexRGBA"/>
+    <rejection class="" function-name="getStatusBadgeSizes"/>
+    <rejection class="" function-name="drawStatusBadge"/>
 
     <!-- ====== REJECTED METHODS: std::function parameters ======
          Shiboken cannot marshal std::function<> types.

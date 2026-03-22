@@ -70,11 +70,6 @@ public:
         const QSize& size = QSize(16, 16),
         ColorRole role = oclero::qlementine::ColorRole::Secondary) const;
 
-    QIcon makeThemedIconFromData(
-        const QByteArray& svgData,
-        const QSize& size = QSize(16, 16),
-        ColorRole role = oclero::qlementine::ColorRole::Secondary) const;
-
     // Icon path getter: accepts a Python callable (str) -> str, or None.
     void setIconPathGetter(SIP_PYCALLABLE /AllowNone/);
 %MethodCode
@@ -121,6 +116,54 @@ public:
         });
     }
 %End
+
+    // Inherited QStyle virtuals — required for Python subclass overrides.
+    virtual void drawPrimitive(QStyle::PrimitiveElement pe,
+        const QStyleOption *opt, QPainter *p,
+        const QWidget *w = nullptr) const;
+    virtual void drawControl(QStyle::ControlElement ce,
+        const QStyleOption *opt, QPainter *p,
+        const QWidget *w = nullptr) const;
+    virtual void drawComplexControl(QStyle::ComplexControl cc,
+        const QStyleOptionComplex *opt, QPainter *p,
+        const QWidget *w = nullptr) const;
+    virtual void polish(QWidget *widget);
+    virtual void polish(QPalette &palette);
+    virtual void polish(QApplication *app);
+    virtual void unpolish(QWidget *widget);
+    virtual void unpolish(QApplication *app);
+    virtual QSize sizeFromContents(QStyle::ContentsType ct,
+        const QStyleOption *opt, const QSize &csz,
+        const QWidget *w = nullptr) const;
+    virtual QRect subElementRect(QStyle::SubElement se,
+        const QStyleOption *opt,
+        const QWidget *w = nullptr) const;
+    virtual QRect subControlRect(QStyle::ComplexControl cc,
+        const QStyleOptionComplex *opt, QStyle::SubControl sc,
+        const QWidget *w = nullptr) const;
+    virtual int pixelMetric(QStyle::PixelMetric m,
+        const QStyleOption *opt = nullptr,
+        const QWidget *w = nullptr) const;
+    virtual int styleHint(QStyle::StyleHint sh,
+        const QStyleOption *opt = nullptr,
+        const QWidget *w = nullptr,
+        QStyleHintReturn *hret = nullptr) const;
+    virtual QIcon standardIcon(QStyle::StandardPixmap sp,
+        const QStyleOption *opt = nullptr,
+        const QWidget *w = nullptr) const;
+    virtual int layoutSpacing(QSizePolicy::ControlType c1,
+        QSizePolicy::ControlType c2, Qt::Orientation o,
+        const QStyleOption *opt = nullptr,
+        const QWidget *w = nullptr) const;
+    virtual QStyle::SubControl hitTestComplexControl(
+        QStyle::ComplexControl cc, const QStyleOptionComplex *opt,
+        const QPoint &pos, const QWidget *w = nullptr) const;
+    virtual QPixmap standardPixmap(QStyle::StandardPixmap sp,
+        const QStyleOption *opt = nullptr,
+        const QWidget *w = nullptr) const;
+    virtual QPixmap generatedIconPixmap(QIcon::Mode mode,
+        const QPixmap &pixmap, const QStyleOption *opt) const;
+    virtual QPalette standardPalette() const;
 
     // Extended QStyle methods.
     virtual void drawPrimitiveExt(
