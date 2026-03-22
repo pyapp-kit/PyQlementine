@@ -4,86 +4,49 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from PySide6 import QtCore, QtGui, QtWidgets  # type: ignore
-    from PySide6.QtCore import (  # type: ignore
-        QJsonDocument,
-        QMargins,
-        QModelIndex,
-        QPoint,
-        QSize,
-        Qt,
-        QTimer,
-    )
-    from PySide6.QtGui import (  # type: ignore
-        QAction,
-        QColor,
-        QFont,
-        QIcon,
-        QImage,
-        QPainter,
-        QPalette,
-        QPixmap,
-    )
-    from PySide6.QtWidgets import QWidget  # type: ignore
 
     BACKEND: str
 else:
     try:
         from PyQt6 import QtCore, QtGui, QtWidgets  # type: ignore
-        from PyQt6.QtCore import (
-            QJsonDocument,
-            QMargins,
-            QModelIndex,
-            QPoint,
-            QSize,
-            Qt,
-            QTimer,
-        )
-        from PyQt6.QtGui import (
-            QAction,
-            QColor,
-            QFont,
-            QIcon,
-            QImage,
-            QPainter,
-            QPalette,
-            QPixmap,
-        )
-        from PyQt6.QtWidgets import QWidget
 
         BACKEND = "PyQt6"
     except ImportError:
         from PySide6 import QtCore, QtGui, QtWidgets  # type: ignore
-        from PySide6.QtCore import (  # type: ignore
-            QJsonDocument,
-            QMargins,
-            QModelIndex,
-            QPoint,
-            QSize,
-            Qt,
-            QTimer,
-        )
-        from PySide6.QtGui import (  # type: ignore
-            QAction,
-            QColor,
-            QFont,
-            QIcon,
-            QImage,
-            QPainter,
-            QPalette,
-            QPixmap,
-        )
-        from PySide6.QtWidgets import QWidget  # type: ignore
 
-    BACKEND = "PySide6"
+        BACKEND = "PySide6"
 
 try:
     import PyQt6Qlementine as Qlementine
 except ImportError:
     import PySide6Qlementine as Qlementine  # type: ignore
 
+QJsonDocument = QtCore.QJsonDocument
+QMargins = QtCore.QMargins
+QModelIndex = QtCore.QModelIndex
+QPoint = QtCore.QPoint
+QPointF = QtCore.QPointF
+QSize = QtCore.QSize
+Qt = QtCore.Qt
+QTimer = QtCore.QTimer
+
+QAction = QtGui.QAction
+QColor = QtGui.QColor
+QFont = QtGui.QFont
+QIcon = QtGui.QIcon
+QImage = QtGui.QImage
+QPainter = QtGui.QPainter
+QPalette = QtGui.QPalette
+QPixmap = QtGui.QPixmap
+
+QWidget = QtWidgets.QWidget
+QApplication = QtWidgets.QApplication
+
+
 __all__ = [
     "BACKEND",
     "QAction",
+    "QApplication",
     "QColor",
     "QFont",
     "QIcon",
@@ -95,6 +58,7 @@ __all__ = [
     "QPalette",
     "QPixmap",
     "QPoint",
+    "QPointF",
     "QSize",
     "QTimer",
     "QWidget",

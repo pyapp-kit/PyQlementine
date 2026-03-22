@@ -1,0 +1,58 @@
+diff --git a/lib/src/widgets/AbstractItemListWidget.cpp b/lib/src/widgets/AbstractItemListWidget.cpp
+index a4d3647..e206995 100644
+--- a/lib/src/widgets/AbstractItemListWidget.cpp
++++ b/lib/src/widgets/AbstractItemListWidget.cpp
+@@ -50,12 +50,16 @@ int AbstractItemListWidget::currentIndex() const {
+ void AbstractItemListWidget::setCurrentIndex(int index) {
+   index = index < 0 || index > itemCount() - 1 ? -1 : index;
+   if (index != _currentIndex) {
++    const auto oldData = currentData();
+     _currentIndex = index;
+     _focusedIndex = index;
+     update();
+     updateCurrentIndexAnimation();
+     updateItemsAnimations();
+     Q_EMIT currentIndexChanged();
++    if (currentData() != oldData) {
++      Q_EMIT currentDataChanged();
++    }
+   }
+ }
+ 
+diff --git a/lib/src/widgets/IconWidget.cpp b/lib/src/widgets/IconWidget.cpp
+index 9979d16..7eb3d43 100644
+--- a/lib/src/widgets/IconWidget.cpp
++++ b/lib/src/widgets/IconWidget.cpp
+@@ -42,6 +42,7 @@ const QIcon& IconWidget::icon() const {
+ 
+ void IconWidget::setIcon(const QIcon& icon) {
+   _icon = icon;
++  Q_EMIT iconChanged();
+   update();
+ }
+ 
+diff --git a/lib/src/widgets/LineEdit.cpp b/lib/src/widgets/LineEdit.cpp
+index 6c23812..da51518 100644
+--- a/lib/src/widgets/LineEdit.cpp
++++ b/lib/src/widgets/LineEdit.cpp
+@@ -22,6 +22,7 @@ const QIcon& LineEdit::icon() const {
+ 
+ void LineEdit::setIcon(const QIcon& icon) {
+   _icon = icon;
++  Q_EMIT iconChanged();
+   update();
+   if (_icon.isNull()) {
+     setTextMargins(0, 0, 0, 0);
+diff --git a/lib/src/widgets/NotificationBadge.cpp b/lib/src/widgets/NotificationBadge.cpp
+index e05f715..7ebdd72 100644
+--- a/lib/src/widgets/NotificationBadge.cpp
++++ b/lib/src/widgets/NotificationBadge.cpp
+@@ -114,7 +114,7 @@ const QColor& NotificationBadge::backgroundColor() const {
+ void NotificationBadge::setBackgroundColor(const QColor& color) {
+   if (color != _backgroundColor) {
+     _backgroundColor = color;
+-    Q_EMIT foregroundColorChanged();
++    Q_EMIT backgroundColorChanged();
+     update();
+   }
+ }
