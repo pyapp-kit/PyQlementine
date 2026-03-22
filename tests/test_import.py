@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from _qt_compat import Qlementine
+from _qt_compat import QApplication, Qlementine
 
 
 def test_import():
     assert Qlementine.QlementineStyle is not None
 
 
-def test_create_style(qapp):
+def test_create_style(qapp: QApplication) -> None:
     style = Qlementine.QlementineStyle()
     assert style is not None
     assert style.animationsEnabled() is True
@@ -22,7 +22,7 @@ def test_core_enums_exist():
     assert Qlementine.TextRole.H1 is not None
 
 
-def test_core_widgets_construct(qapp):
+def test_core_widgets_construct(qapp: QApplication) -> None:
     assert Qlementine.Switch() is not None
     assert Qlementine.Label("Hello") is not None
     assert Qlementine.LineEdit() is not None

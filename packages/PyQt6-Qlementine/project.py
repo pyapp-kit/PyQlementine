@@ -29,18 +29,14 @@ def fix_rpath_macos(so: Path, new_rpaths: list[str]) -> None:
 
     # add new rpaths
     for rpath in new_rpaths:
-        subprocess.run(
-            ["install_name_tool", "-add_rpath", rpath, str(so)], check=True
-        )
+        subprocess.run(["install_name_tool", "-add_rpath", rpath, str(so)], check=True)
     print(f"Updated RPATH for {so} to {new_rpaths}")
 
 
 def fix_rpath_linux(so: Path, new_rpaths: list[str]) -> None:
     subprocess.run(["patchelf", "--remove-rpath", str(so)], check=True)
     rpath_str = ":".join(new_rpaths)
-    subprocess.run(
-        ["patchelf", "--set-rpath", rpath_str, str(so)], check=True
-    )
+    subprocess.run(["patchelf", "--set-rpath", rpath_str, str(so)], check=True)
     print(f"Updated RPATH for {so} to {rpath_str}")
 
 

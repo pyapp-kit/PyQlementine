@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from _qt_compat import QColor, QJsonDocument, Qlementine, QSize
+from _qt_compat import QApplication, QColor, QJsonDocument, Qlementine, QSize
+
+if TYPE_CHECKING:
+    from pytestqt.qtbot import QtBot
 
 THEMES_DIR = Path(__file__).parent / "themes"
 
@@ -38,46 +42,46 @@ def test_theme_meta_set_fields():
 # --- Theme defaults ---
 
 
-def test_theme_default_meta(qapp):
+def test_theme_default_meta(qapp: QApplication) -> None:
     t = Theme()
     assert t.meta.name == ""
 
 
-def test_theme_default_animation_duration(qapp):
+def test_theme_default_animation_duration(qapp: QApplication) -> None:
     assert Theme().animationDuration == 192
 
 
-def test_theme_default_border_radius(qapp):
+def test_theme_default_border_radius(qapp: QApplication) -> None:
     assert Theme().borderRadius == 6.0
 
 
-def test_theme_default_control_heights(qapp):
+def test_theme_default_control_heights(qapp: QApplication) -> None:
     t = Theme()
     assert t.controlHeightLarge == 28
     assert t.controlHeightMedium == 24
     assert t.controlHeightSmall == 16
 
 
-def test_theme_default_font_size(qapp):
+def test_theme_default_font_size(qapp: QApplication) -> None:
     assert Theme().fontSize == 12
 
 
-def test_theme_default_spacing(qapp):
+def test_theme_default_spacing(qapp: QApplication) -> None:
     assert Theme().spacing == 8
 
 
-def test_theme_default_icon_size(qapp):
+def test_theme_default_icon_size(qapp: QApplication) -> None:
     assert Theme().iconSize == QSize(16, 16)
 
 
-def test_theme_default_border_width(qapp):
+def test_theme_default_border_width(qapp: QApplication) -> None:
     assert Theme().borderWidth == 1.0
 
 
 # --- Theme color properties ---
 
 
-def test_theme_colors_are_qcolor(qapp):
+def test_theme_colors_are_qcolor(qapp: QApplication) -> None:
     t = Theme()
     assert isinstance(t.backgroundColorMain1, QColor)
     assert isinstance(t.primaryColor, QColor)
@@ -93,12 +97,12 @@ def test_theme_colors_are_qcolor(qapp):
 # --- Theme serialization ---
 
 
-def test_theme_to_json_not_null(qapp):
+def test_theme_to_json_not_null(qapp: QApplication) -> None:
     doc = Theme().toJson()
     assert not doc.isNull()
 
 
-def test_theme_json_roundtrip(qapp):
+def test_theme_json_roundtrip(qapp: QApplication) -> None:
     t = Theme()
     t.meta.name = "RoundTrip"
     t.meta.version = "2.0"
@@ -113,7 +117,7 @@ def test_theme_json_roundtrip(qapp):
     assert restored.borderRadius == t.borderRadius
 
 
-def test_theme_from_json_path_light(qapp):
+def test_theme_from_json_path_light(qapp: QApplication) -> None:
     t = Theme.fromJsonPath(str(THEMES_DIR / "light.json"))
     assert t is not None
     assert t.meta.name == "Light"
@@ -122,19 +126,19 @@ def test_theme_from_json_path_light(qapp):
     assert t.backgroundColorMain1 == QColor("#ffffff")
 
 
-def test_theme_from_json_path_dark(qapp):
+def test_theme_from_json_path_dark(qapp: QApplication) -> None:
     t = Theme.fromJsonPath(str(THEMES_DIR / "dark.json"))
     assert t is not None
     assert t.meta.name == "Dark"
     assert t.backgroundColorMain1 == QColor("#1f2127")
 
 
-def test_theme_from_json_path_nonexistent(qapp):
+def test_theme_from_json_path_nonexistent(qapp: QApplication) -> None:
     with pytest.raises(ValueError, match="Failed to load theme"):
         Theme.fromJsonPath("/nonexistent/path.json")
 
 
-def test_theme_from_json_doc_with_fixture(qapp):
+def test_theme_from_json_doc_with_fixture(qapp: QApplication) -> None:
     path = THEMES_DIR / "light.json"
     doc = QJsonDocument.fromJson(path.read_bytes())
     t = Theme.fromJsonDoc(doc)
@@ -142,11 +146,11 @@ def test_theme_from_json_doc_with_fixture(qapp):
     assert t.meta.name == "Light"
 
 
-def test_theme_equality(qapp):
+def test_theme_equality(qapp: QApplication) -> None:
     assert Theme() == Theme()
 
 
-def test_theme_inequality_after_change(qapp):
+def test_theme_inequality_after_change(qapp: QApplication) -> None:
     a = Theme()
     b = Theme()
     b.borderRadius = 999.0
@@ -156,13 +160,13 @@ def test_theme_inequality_after_change(qapp):
 # --- ThemeManager ---
 
 
-def test_theme_manager_empty(qapp):
+def test_theme_manager_empty(qapp: QApplication) -> None:
     tm = ThemeManager()
     assert tm.themeCount() == 0
     assert tm.currentTheme() == ""
 
 
-def test_theme_manager_add_theme(qapp):
+def test_theme_manager_add_theme(qapp: QApplication) -> None:
     tm = ThemeManager()
     t = Theme()
     t.meta.name = "Light"
@@ -170,7 +174,7 @@ def test_theme_manager_add_theme(qapp):
     assert tm.themeCount() == 1
 
 
-def test_theme_manager_set_current_theme(qapp):
+def test_theme_manager_set_current_theme(qapp: QApplication) -> None:
     tm = ThemeManager()
     t1 = Theme()
     t1.meta.name = "Light"
@@ -184,7 +188,7 @@ def test_theme_manager_set_current_theme(qapp):
     assert tm.currentThemeIndex() == 1
 
 
-def test_theme_manager_set_current_theme_index(qapp):
+def test_theme_manager_set_current_theme_index(qapp: QApplication) -> None:
     tm = ThemeManager()
     for name in ("A", "B", "C"):
         t = Theme()
@@ -196,7 +200,7 @@ def test_theme_manager_set_current_theme_index(qapp):
     assert tm.currentThemeIndex() == 2
 
 
-def test_theme_manager_theme_index_lookup(qapp):
+def test_theme_manager_theme_index_lookup(qapp: QApplication) -> None:
     tm = ThemeManager()
     for name in ("X", "Y", "Z"):
         t = Theme()
@@ -208,7 +212,7 @@ def test_theme_manager_theme_index_lookup(qapp):
     assert tm.themeIndex("Z") == 2
 
 
-def test_theme_manager_next_previous(qapp):
+def test_theme_manager_next_previous(qapp: QApplication) -> None:
     tm = ThemeManager()
     for name in ("A", "B", "C"):
         t = Theme()
@@ -228,7 +232,7 @@ def test_theme_manager_next_previous(qapp):
     assert tm.currentTheme() == "B"
 
 
-def test_theme_manager_with_style(qapp):
+def test_theme_manager_with_style(qapp: QApplication) -> None:
     style = QlementineStyle()
     tm = ThemeManager()
     tm.setStyle(style)
@@ -243,7 +247,7 @@ def test_theme_manager_with_style(qapp):
     assert style.theme().borderRadius == 12.0
 
 
-def test_theme_manager_constructor_with_style(qapp):
+def test_theme_manager_constructor_with_style(qapp: QApplication) -> None:
     """Regression test for oclero/qlementine#148."""
     style = QlementineStyle()
     tm = ThemeManager(style)
@@ -262,13 +266,13 @@ def test_theme_manager_constructor_with_style(qapp):
     assert style.theme().borderRadius == 42.0
 
 
-def test_theme_manager_load_directory(qapp):
+def test_theme_manager_load_directory(qapp: QApplication) -> None:
     tm = ThemeManager()
     tm.loadDirectory(str(THEMES_DIR))
     assert tm.themeCount() == 2
 
 
-def test_theme_manager_load_directory_and_select(qapp):
+def test_theme_manager_load_directory_and_select(qapp: QApplication) -> None:
     style = QlementineStyle()
     tm = ThemeManager()
     tm.setStyle(style)
@@ -283,7 +287,7 @@ def test_theme_manager_load_directory_and_select(qapp):
     assert style.theme().backgroundColorMain1 == QColor("#ffffff")
 
 
-def test_theme_manager_load_directory_navigate(qapp):
+def test_theme_manager_load_directory_navigate(qapp: QApplication) -> None:
     tm = ThemeManager()
     tm.loadDirectory(str(THEMES_DIR))
     assert tm.themeCount() == 2
@@ -294,3 +298,25 @@ def test_theme_manager_load_directory_navigate(qapp):
     second = tm.currentTheme()
     assert first != second
     assert {first, second} == {"Light", "Dark"}
+
+
+# --- ThemeManager signals ---
+
+
+def test_theme_manager_current_theme_changed_signal(qtbot: QtBot) -> None:
+    tm = ThemeManager()
+    for name in ("A", "B"):
+        t = Theme()
+        t.meta.name = name
+        tm.addTheme(t)
+    # addTheme auto-selects index 0 ("A"), so switching to "B" triggers the signal.
+    with qtbot.waitSignal(tm.currentThemeChanged):
+        tm.setCurrentTheme("B")
+
+
+def test_theme_manager_theme_count_changed_signal(qtbot: QtBot) -> None:
+    tm = ThemeManager()
+    t = Theme()
+    t.meta.name = "New"
+    with qtbot.waitSignal(tm.themeCountChanged):
+        tm.addTheme(t)

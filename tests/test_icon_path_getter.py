@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-from _qt_compat import QIcon, Qlementine, QSize
+from _qt_compat import QApplication, QIcon, Qlementine, QSize
 
 QlementineStyle = Qlementine.QlementineStyle
 
@@ -15,7 +15,7 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 _TEST_SVG = _REPO_ROOT / "qlementine" / "sandbox" / "resources" / "test_image_16x16.svg"
 
 
-def test_set_icon_path_getter_with_callable(qapp):
+def test_set_icon_path_getter_with_callable(qapp: QApplication) -> None:
     """setIconPathGetter accepts a plain Python callable."""
     style = QlementineStyle()
     getter = MagicMock(return_value=str(_TEST_SVG))
@@ -27,7 +27,7 @@ def test_set_icon_path_getter_with_callable(qapp):
     getter.assert_called_once_with("anything")
 
 
-def test_set_icon_path_getter_with_lambda(qapp):
+def test_set_icon_path_getter_with_lambda(qapp: QApplication) -> None:
     """setIconPathGetter works with a lambda."""
     style = QlementineStyle()
     style.setIconPathGetter(lambda name: str(_TEST_SVG))
@@ -36,7 +36,7 @@ def test_set_icon_path_getter_with_lambda(qapp):
     assert not icon.isNull()
 
 
-def test_set_icon_path_getter_accepts_pathlike(qapp):
+def test_set_icon_path_getter_accepts_pathlike(qapp: QApplication) -> None:
     """The callback may return a pathlib.Path (or any os.PathLike)."""
     style = QlementineStyle()
     style.setIconPathGetter(lambda name: _TEST_SVG)  # returns Path, not str
@@ -45,7 +45,7 @@ def test_set_icon_path_getter_accepts_pathlike(qapp):
     assert not icon.isNull()
 
 
-def test_set_icon_path_getter_none_clears(qapp):
+def test_set_icon_path_getter_none_clears(qapp: QApplication) -> None:
     """Passing None clears a previously set getter (falls back to QIcon.fromTheme)."""
     style = QlementineStyle()
     style.setIconPathGetter(lambda name: str(_TEST_SVG))
@@ -56,14 +56,14 @@ def test_set_icon_path_getter_none_clears(qapp):
     assert icon.isNull()
 
 
-def test_set_icon_path_getter_rejects_non_callable(qapp):
+def test_set_icon_path_getter_rejects_non_callable(qapp: QApplication) -> None:
     """Passing a non-callable raises TypeError."""
     style = QlementineStyle()
     with pytest.raises(TypeError):
         style.setIconPathGetter(42)  # type: ignore[arg-type]
 
 
-def test_set_icon_path_getter_forwards_name(qapp):
+def test_set_icon_path_getter_forwards_name(qapp: QApplication) -> None:
     """The icon name is correctly forwarded to the Python callback."""
     received = []
     style = QlementineStyle()
