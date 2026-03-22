@@ -14,8 +14,24 @@ import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-SIP_DIR = REPO_ROOT / "packages" / "PyQt6-Qlementine" / "sip" / "_utils"
+SIP_DIR = REPO_ROOT / "packages" / "PyQt6-Qlementine" / "sip" / "_qlementine"
 OUTPUT = Path(__file__).resolve().parents[1] / "UtilsBridge.hpp"
+
+# SIP files that define utility free functions (not classes/widgets).
+_UTILS_SIP_FILES = {
+    "BadgeUtils.sip",
+    "ColorUtils.sip",
+    "FontUtils.sip",
+    "GeometryUtils.sip",
+    "IconUtils.sip",
+    "ImageUtils.sip",
+    "LayoutUtils.sip",
+    "MenuUtils.sip",
+    "PrimitiveUtils.sip",
+    "StateUtils.sip",
+    "StyleUtils.sip",
+    "WidgetUtils.sip",
+}
 
 def _find_functions(text: str) -> list[tuple[str, str, str]]:
     """Extract function declarations, handling nested parens in defaults."""
@@ -192,8 +208,8 @@ def main() -> None:
     all_functions: list[tuple[str, str, str]] = []
 
     for sip_file in sorted(SIP_DIR.glob("*.sip")):
-        if sip_file.name.startswith("PyQt6"):
-            continue  # skip the module definition file
+        if sip_file.name not in _UTILS_SIP_FILES:
+            continue
         includes, functions = parse_sip_file(sip_file)
         all_includes.extend(includes)
         all_functions.extend(functions)
