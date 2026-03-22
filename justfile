@@ -30,7 +30,7 @@ install-pyside6: _clone (install-qt "6.10.2")
 [unix]
 clean:
     rm -rf build dist wheelhouse Qt
-    rm -f aqtinstall.log
+    rm -f aqtinstall.log packages/PySide6-Qlementine/UtilsBridge.hpp
 
 [windows]
 clean:
@@ -38,6 +38,8 @@ clean:
     if (Test-Path dist) { Remove-Item -Recurse -Force dist }
     if (Test-Path wheelhouse) { Remove-Item -Recurse -Force wheelhouse }
     if (Test-Path Qt) { Remove-Item -Recurse -Force Qt }
+    Remove-Item -ErrorAction SilentlyContinue aqtinstall.log
+    Remove-Item -ErrorAction SilentlyContinue packages/PySide6-Qlementine/UtilsBridge.hpp
 
 # run demo widget
 demo:

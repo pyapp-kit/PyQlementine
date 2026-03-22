@@ -9,6 +9,16 @@ set(CMAKE_AUTORCC ON)
 # ---- Find Python ----
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
+# ---- Generate UtilsBridge.hpp from PyQt6 SIP files ----
+execute_process(
+    COMMAND ${Python_EXECUTABLE}
+        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_utils_bridge.py"
+    RESULT_VARIABLE _gen_rc
+)
+if(NOT _gen_rc EQUAL 0)
+    message(FATAL_ERROR "generate_utils_bridge.py failed (rc=${_gen_rc})")
+endif()
+
 # ---- Detect site-packages for Shiboken6Tools ----
 execute_process(
     COMMAND ${Python_EXECUTABLE} -c
