@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from _qt_compat import Qlementine, QtCore
 
-pytestmark = __import__("conftest").skip_no_utils
 
 
 def test_point_inside_rounded_rect():

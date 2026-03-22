@@ -9,7 +9,6 @@ from _qt_compat import QColor, QIcon, Qlementine, QSize
 
 IconTheme = Qlementine.IconTheme
 
-pytestmark = __import__("conftest").skip_no_utils
 
 SVG_CONTENT = (
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">'

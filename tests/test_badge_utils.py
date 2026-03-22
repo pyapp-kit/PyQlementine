@@ -8,7 +8,6 @@ StatusBadge = Qlementine.StatusBadge
 StatusBadgeSize = Qlementine.StatusBadgeSize
 Theme = Qlementine.Theme
 
-pytestmark = __import__("conftest").skip_no_utils
 
 
 def test_draw_status_badge(qapp):

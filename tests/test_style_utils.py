@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from _qt_compat import Qlementine, QWidget
 
-pytestmark = __import__("conftest").skip_no_utils
 
 
 def test_should_have_hover_events(qapp):

@@ -7,7 +7,6 @@ from _qt_compat import QColor, Qlementine, QSize, QtGui
 ColorizeMode = Qlementine.ColorizeMode
 RadiusesF = Qlementine.RadiusesF
 
-pytestmark = __import__("conftest").skip_no_utils
 
 
 def test_colorize_image(qapp):

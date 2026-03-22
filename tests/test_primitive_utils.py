@@ -9,7 +9,6 @@ MouseState = Qlementine.MouseState
 RadiusesF = Qlementine.RadiusesF
 Theme = Qlementine.Theme
 
-pytestmark = __import__("conftest").skip_no_utils
 
 
 def _make_painter():

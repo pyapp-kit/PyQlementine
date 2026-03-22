@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from _qt_compat import Qlementine, QtWidgets, QWidget
 
-pytestmark = __import__("conftest").skip_no_utils
 
 
 def test_get_layout_margins(qapp):

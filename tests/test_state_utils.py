@@ -13,7 +13,6 @@ ColorRole = Qlementine.ColorRole
 
 QStyle = QtWidgets.QStyle
 
-pytestmark = __import__("conftest").skip_no_utils
 
 
 def test_get_mouse_state_from_flags(qapp):
