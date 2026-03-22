@@ -9,7 +9,14 @@ from _qt_compat import Qlementine, QtCore, QTimer, QtWidgets
 
 QlementineStyle = Qlementine.QlementineStyle
 
-SKIP = ("QAbstract", "QHeaderView", "QRubberBand", "QSizeGrip", "QSplitterHandle")
+SKIP = (
+    "QAbstract",
+    "QHeaderView",
+    "QRhiWidget",
+    "QRubberBand",
+    "QSizeGrip",
+    "QSplitterHandle",
+)
 # SKIP += ("QErrorMessage",)
 _ALL_WIDGET_CLASSES: list[type[QtWidgets.QWidget]] = sorted(
     (
