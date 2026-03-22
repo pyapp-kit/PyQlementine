@@ -31,6 +31,7 @@ public slots:
     void setForegroundColor(const QColor&);
     void setBackgroundColor(const QColor&);
     void setRelativePosition(const QPoint&);
+    void setRelativePosition(int x, int y);
     void setPadding(const QMargins&);
 
 signals:
