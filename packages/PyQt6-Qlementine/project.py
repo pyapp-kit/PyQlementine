@@ -1,9 +1,13 @@
+import csv
+import hashlib
+import io
 import os
 import platform
 import re
 import shutil
 import subprocess
 import sys
+from base64 import urlsafe_b64encode
 from pathlib import Path
 
 from pyqtbuild import PyQtBindings, PyQtProject, QmakeBuilder
@@ -155,6 +159,35 @@ def _generate_utils_pyi(init_pyi: Path, utils_pyi: Path) -> None:
     )
 
 
+def _regenerate_record(wheel_dir: Path) -> None:
+    """Regenerate the RECORD file inside an unpacked wheel directory."""
+    dist_info = next(wheel_dir.glob("*.dist-info"))
+    record_path = dist_info / "RECORD"
+
+    rows: list[list[str]] = []
+    for file in sorted(wheel_dir.rglob("*")):
+        if file.is_dir():
+            continue
+        rel = file.relative_to(wheel_dir).as_posix()
+        if rel == record_path.relative_to(wheel_dir).as_posix():
+            continue
+        h = hashlib.sha256()
+        size = 0
+        with open(file, "rb") as f:
+            for chunk in iter(lambda: f.read(65536), b""):
+                h.update(chunk)
+                size += len(chunk)
+        digest = urlsafe_b64encode(h.digest()).rstrip(b"=").decode("ascii")
+        rows.append([rel, f"sha256={digest}", str(size)])
+
+    rows.append([record_path.relative_to(wheel_dir).as_posix(), "", ""])
+
+    buf = io.StringIO()
+    writer = csv.writer(buf, lineterminator="\n")
+    writer.writerows(rows)
+    record_path.write_text(buf.getvalue(), encoding="utf-8")
+
+
 class _Builder(QmakeBuilder):
     def install_project(self, target_dir, *, wheel_tag=None):
         super().install_project(target_dir, wheel_tag=wheel_tag)
@@ -212,6 +245,9 @@ class _Builder(QmakeBuilder):
         # Fix rpaths so the .so resolves Qt from PyQt6 at runtime.
         if sys.platform != "win32":
             fix_rpaths(package)
+
+        # Regenerate RECORD since we modified files after make install.
+        _regenerate_record(Path(target_dir))
 
 
 class PyQt6Qlementine(PyQtProject):
