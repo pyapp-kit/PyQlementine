@@ -18,7 +18,6 @@ RPATH_RE_MAC = re.compile(r"^\s*path (.+) \(offset \d+\)$", re.MULTILINE)
 
 
 def fix_rpath_macos(so: Path, new_rpaths: list[str]) -> None:
-    # delete all current rpaths
     current_rpath = subprocess.run(
         ["otool", "-l", str(so)], capture_output=True, text=True
     )
@@ -26,10 +25,10 @@ def fix_rpath_macos(so: Path, new_rpaths: list[str]) -> None:
         subprocess.run(
             ["install_name_tool", "-delete_rpath", rpath, str(so)], check=True
         )
-
-    # add new rpaths
     for rpath in new_rpaths:
-        subprocess.run(["install_name_tool", "-add_rpath", rpath, str(so)], check=True)
+        subprocess.run(
+            ["install_name_tool", "-add_rpath", rpath, str(so)], check=True
+        )
     print(f"Updated RPATH for {so} to {new_rpaths}")
 
 
@@ -82,86 +81,9 @@ def _patch_agl_framework(qt_prefix: Path) -> None:
             path.write_text(patched)
 
 
-class _Builder(QmakeBuilder):
-    def install_project(self, target_dir, *, wheel_tag=None):
-        super().install_project(target_dir, wheel_tag=wheel_tag)
-        package = Path(target_dir, "PyQt6Qlementine")
-
-        # -- __init__.py -----------------------------------------------------
-        init_lines = []
-        if os.name == "nt":
-            init_lines.append(
-                "try:\n"
-                "    import PyQt6\n"
-                "except ImportError:\n"
-                '    raise ImportError("PyQt6 must be installed to use '
-                'PyQt6Qlementine.") from None\n'
-                "del PyQt6\n"
-            )
-        init_lines.append("from ._qlementine import *  # noqa: F403\n")
-        init_lines.append("from . import utils as utils\n")
-        (package / "__init__.py").write_text("\n".join(init_lines))
-
-        # -- utils.py --------------------------------------------------------
-        (package / "utils.py").write_text(
-            '"""Qlementine utility functions."""\n'
-            "from ._utils import *  # noqa: F403\n"
-        )
-
-        # -- stubs -----------------------------------------------------------
-        for src_name, dest_name in [
-            ("_qlementine.pyi", "__init__.pyi"),
-            ("_utils.pyi", "utils.pyi"),
-        ]:
-            src = package / src_name
-            if not src.exists():
-                continue
-            text = src.read_text()
-            src.unlink()
-            # fix known SIP stub bugs
-            text = text.replace("*]", "]")
-            text = text.replace(" Any", " typing.Any")
-            text = re.sub(r"=\s*\.\.\.\s*#\s*type:\s*\S+", "= ...", text)
-            dest = package / dest_name
-            dest.write_text(text)
-            _run_ruff(dest)
-
-        # Add utils re-export to __init__.pyi
-        init_pyi = package / "__init__.pyi"
-        if init_pyi.exists():
-            text = init_pyi.read_text().rstrip()
-            text += "\n\nfrom . import utils as utils\n"
-            init_pyi.write_text(text)
-
-        # Add cross-import to utils.pyi
-        utils_pyi = package / "utils.pyi"
-        if utils_pyi.exists():
-            text = utils_pyi.read_text()
-            # Insert `from . import *` after the import block
-            lines = text.split("\n")
-            insert_idx = 0
-            for i, ln in enumerate(lines):
-                if ln.startswith(("import ", "from ", "#", "try:", "    ", "except")):
-                    insert_idx = i + 1
-                elif ln.strip() == "" and insert_idx:
-                    insert_idx = i + 1
-                else:
-                    break
-            lines.insert(insert_idx, "from . import *\n")
-            utils_pyi.write_text("\n".join(lines))
-
-        (package / "py.typed").touch()
-
-        # Fix rpaths so the .so resolves Qt from PyQt6 at runtime.
-        if sys.platform != "win32":
-            fix_rpaths(package)
-
-
 def _run_ruff(path: Path) -> None:
     if not shutil.which("ruff"):
         return
-    import subprocess
-
     subprocess.run(
         ["ruff", "check", str(path), "--fix-only", "--select", "E,F,W,I,TC"],
         check=False,
@@ -172,11 +94,131 @@ def _run_ruff(path: Path) -> None:
     )
 
 
+def _fix_pyi_stubs(pyi: Path) -> None:
+    """Fix known SIP stub-generation bugs."""
+    text = pyi.read_text()
+    text = text.replace("*]", "]")
+    text = text.replace(" Any", " typing.Any")
+    text = re.sub(r"=\s*\.\.\.\s*#\s*type:\s*\S+", "= ...", text)
+    pyi.write_text(text)
+    _run_ruff(pyi)
+
+
+def _generate_utils_pyi(init_pyi: Path, utils_pyi: Path) -> None:
+    """Extract free-function stubs from __init__.pyi into utils.pyi.
+
+    Copies only top-level ``def`` and ``@typing.overload`` lines (plus
+    the import preamble) so that ``utils.pyi`` mirrors what
+    ``utils.py`` re-exports at runtime.
+    """
+    lines = init_pyi.read_text().splitlines(keepends=True)
+    imports: list[str] = []
+    functions: list[str] = []
+    in_class = False
+    in_function = False
+
+    for line in lines:
+        stripped = line.rstrip()
+        # Track class blocks (skip methods)
+        if stripped.startswith("class "):
+            in_class = True
+            in_function = False
+            continue
+        if in_class:
+            if stripped and not stripped[0].isspace():
+                in_class = False
+            else:
+                continue
+
+        # Collect import lines
+        if stripped.startswith(("import ", "from ")):
+            imports.append(line)
+            continue
+
+        # Collect top-level function defs and their decorators
+        if stripped.startswith("@"):
+            functions.append(line)
+            continue
+        if stripped.startswith("def "):
+            in_function = True
+            functions.append(line)
+            continue
+        # Continuation of a multi-line signature
+        if in_function:
+            functions.append(line)
+            if stripped.endswith(":") or stripped == "...":
+                in_function = False
+            continue
+
+    utils_pyi.write_text(
+        "".join(imports) + "\nfrom . import *\n\n" + "".join(functions)
+    )
+
+
+class _Builder(QmakeBuilder):
+    def install_project(self, target_dir, *, wheel_tag=None):
+        super().install_project(target_dir, wheel_tag=wheel_tag)
+        package = Path(target_dir, "PyQt6Qlementine")
+
+        # -- __init__.py -------------------------------------------------
+        init = "from ._qlementine import *  # noqa: F403\n"
+        if os.name == "nt":
+            init = (
+                "try:\n"
+                "    import PyQt6\n"
+                "except ImportError:\n"
+                '    raise ImportError("PyQt6 must be installed to use '
+                'PyQt6Qlementine.") from None\n'
+                "del PyQt6\n\n" + init
+            )
+        init += "from . import utils as utils\n"
+        (package / "__init__.py").write_text(init)
+
+        # -- utils.py (re-export free functions from _qlementine) --------
+        (package / "utils.py").write_text(
+            '"""Qlementine utility functions."""\n\n\n'
+            "def _init():\n"
+            "    from . import _qlementine as _ql\n\n"
+            "    ns = globals()\n"
+            "    for name in dir(_ql):\n"
+            "        if name.startswith('_'):\n"
+            "            continue\n"
+            "        obj = getattr(_ql, name)\n"
+            "        if isinstance(obj, type):\n"
+            "            continue\n"
+            "        ns[name] = obj\n\n\n"
+            "_init()\n"
+            "del _init\n"
+        )
+
+        # -- stubs -------------------------------------------------------
+        src_pyi = package / "_qlementine.pyi"
+        init_pyi = package / "__init__.pyi"
+        if src_pyi.exists():
+            src_pyi.rename(init_pyi)
+            _fix_pyi_stubs(init_pyi)
+
+            # Generate utils.pyi from the function stubs
+            utils_pyi = package / "utils.pyi"
+            _generate_utils_pyi(init_pyi, utils_pyi)
+
+            # Add utils re-export to __init__.pyi
+            text = init_pyi.read_text().rstrip()
+            text += "\n\nfrom . import utils as utils\n"
+            init_pyi.write_text(text)
+
+        (package / "py.typed").touch()
+
+        # Fix rpaths so the .so resolves Qt from PyQt6 at runtime.
+        if sys.platform != "win32":
+            fix_rpaths(package)
+
+
 class PyQt6Qlementine(PyQtProject):
     def __init__(self):
         super().__init__()
         self.builder_factory = _Builder
-        self.bindings_factories = [PyQt6Qlementinemod, PyQt6QlementineUtilsmod]
+        self.bindings_factories = [PyQt6Qlementinemod]
         self.verbose = bool(os.getenv("CI") or os.getenv("CIBUILDWHEEL"))
 
     def apply_user_defaults(self, tool):
@@ -196,32 +238,14 @@ class PyQt6Qlementine(PyQtProject):
         print(f"USING QMAKE: {qmake_bin}")
         self.builder.qmake = qmake_bin
 
-        # AGL framework was removed in newer macOS SDKs; patch Qt mkspecs
         if platform.system() == "Darwin":
             _patch_agl_framework(Path(qmake_bin).parents[1])
 
         return super().apply_user_defaults(tool)
 
     def build_wheel(self, wheel_directory):
-        # use lowercase name for wheel, for
-        # https://packaging.python.org/en/latest/specifications/binary-distribution-format/
         self.name = self.name.lower()
         return super().build_wheel(wheel_directory)
-
-
-class PyQt6QlementineUtilsmod(PyQtBindings):
-    def __init__(self, project):
-        super().__init__(project, "PyQt6QlementineUtils")
-
-    def apply_user_defaults(self, tool):
-        self.builder_settings.append("CONFIG += c++17")
-        if sys.platform == "win32":
-            self.builder_settings.append("QMAKE_CXXFLAGS += /std:c++17 /W0")
-        else:
-            self.builder_settings.append(
-                "QMAKE_CXXFLAGS += -std=c++17 -Wno-error -Wno-overloaded-virtual"
-            )
-        super().apply_user_defaults(tool)
 
 
 class PyQt6Qlementinemod(PyQtBindings):
@@ -230,7 +254,6 @@ class PyQt6Qlementinemod(PyQtBindings):
 
     def apply_user_defaults(self, tool):
         repo_root = str(_find_repo_root())
-        # add Qt resource files
         for qrc in [
             "qlementine/lib/resources/qlementine.qrc",
             "qlementine/lib/resources/qlementine_font_inter.qrc",
@@ -239,7 +262,6 @@ class PyQt6Qlementinemod(PyQtBindings):
             resource_file = os.path.join(repo_root, qrc)
             self.builder_settings.append("RESOURCES += " + resource_file)
 
-        # enable C++17 and suppress warnings from qlementine headers
         self.builder_settings.append("CONFIG += c++17")
         if sys.platform == "win32":
             self.builder_settings.append("QMAKE_CXXFLAGS += /std:c++17 /W0")

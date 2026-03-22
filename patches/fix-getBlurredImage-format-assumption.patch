@@ -1,0 +1,16 @@
+diff --git a/lib/src/utils/ImageUtils.cpp b/lib/src/utils/ImageUtils.cpp
+index 5f0df8e..a1b2c3f 100644
+--- a/lib/src/utils/ImageUtils.cpp
++++ b/lib/src/utils/ImageUtils.cpp
+@@ -306,8 +306,9 @@ QImage getBlurredImage(const QImage& inputImage, double blurRadius) {
+   if (inputImage.isNull())
+     return {};
+
+-  auto input = inputImage.copy();
+-  auto output = inputImage.copy();
++  // Ensure ARGB32 format — fast_gaussian_blur assumes 4 channels per pixel.
++  auto input = inputImage.convertToFormat(QImage::Format_ARGB32);
++  auto output = inputImage.convertToFormat(QImage::Format_ARGB32);
+   auto* inputData = input.bits();
+   auto* outputData = output.bits();
+   constexpr auto channelCount = 4; // ARGB

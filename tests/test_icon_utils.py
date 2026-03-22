@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
-
 from _qt_compat import QColor, QIcon, Qlementine, QSize
 
 IconTheme = Qlementine.IconTheme
