@@ -19,7 +19,7 @@ This is a **uv-based monorepo**. The two publishable packages live under
 Other important directories:
 
 - `qlementine/` — **git submodule** pointing at the upstream C++ repo.
-  **Never edit files here directly.** See "Patches" below.
+  **NEVER edit files here directly.** See "Patches" below.
 - `patches/` — plain `git diff` patches applied to the submodule at build time.
   (Standard unified diff format, **not** `git format-patch` / email format.)
 - `tests/` — shared test suite; a compat shim (`tests/_qt_compat.py`) lets the
@@ -54,7 +54,7 @@ under `[tool.cibuildwheel]`.
 
 ## Patches
 
-The `qlementine/` submodule should **never** be edited in-place. To apply a fix
+The `qlementine/` submodule should **NEVER** be edited in-place. To apply a fix
 or experiment with upstream changes:
 
 1. Create a standard unified diff (`git diff` output, **not** `--email` /
@@ -63,6 +63,12 @@ or experiment with upstream changes:
    `152-fix-lineedit-width-calculation.patch`).
 3. Patches are applied automatically by `just _patch` (called during install /
    build).
+
+to reset/replay everything, you can:
+
+```sh
+rm -rf ./qlementine && just _clone
+```
 
 ## Binding details
 

@@ -5,7 +5,16 @@ from __future__ import annotations
 import os
 import tempfile
 
-from _qt_compat import QColor, QIcon, QImage, Qlementine, QPixmap, QSize, QWidget
+from _qt_compat import (
+    QApplication,
+    QColor,
+    QIcon,
+    QImage,
+    Qlementine,
+    QPixmap,
+    QSize,
+    QWidget,
+)
 
 IconTheme = Qlementine.IconTheme
 AutoIconColor = Qlementine.AutoIconColor
@@ -70,7 +79,7 @@ def test_icon_theme_color_method():
 # ---- makeIconFromSvg ----
 
 
-def test_make_icon_from_svg_uncolored(qapp):
+def test_make_icon_from_svg_uncolored(qapp: QApplication) -> None:
     with tempfile.TemporaryDirectory() as d:
         path = _write_svg(d)
         icon = Qlementine.makeIconFromSvg(path, QSize(16, 16))
@@ -78,7 +87,7 @@ def test_make_icon_from_svg_uncolored(qapp):
         assert not icon.isNull()
 
 
-def test_make_icon_from_svg_with_theme(qapp):
+def test_make_icon_from_svg_with_theme(qapp: QApplication) -> None:
     with tempfile.TemporaryDirectory() as d:
         path = _write_svg(d)
         theme = IconTheme(QColor("red"), QColor("gray"))
@@ -87,7 +96,7 @@ def test_make_icon_from_svg_with_theme(qapp):
         assert not icon.isNull()
 
 
-def test_make_icon_from_svg_themed_default_size(qapp):
+def test_make_icon_from_svg_themed_default_size(qapp: QApplication) -> None:
     with tempfile.TemporaryDirectory() as d:
         path = _write_svg(d)
         theme = IconTheme(QColor("red"))
@@ -105,7 +114,7 @@ def _make_test_pixmap() -> QPixmap:
     return QPixmap.fromImage(img)
 
 
-def test_colorize_pixmap(qapp):
+def test_colorize_pixmap(qapp: QApplication) -> None:
     src = _make_test_pixmap()
     result = Qlementine.colorizePixmap(src, QColor("red"))
     assert isinstance(result, QPixmap)
@@ -113,21 +122,21 @@ def test_colorize_pixmap(qapp):
     assert result.size() == src.size()
 
 
-def test_tint_pixmap(qapp):
+def test_tint_pixmap(qapp: QApplication) -> None:
     src = _make_test_pixmap()
     result = Qlementine.tintPixmap(src, QColor("green"))
     assert isinstance(result, QPixmap)
     assert not result.isNull()
 
 
-def test_get_colorized_pixmap(qapp):
+def test_get_colorized_pixmap(qapp: QApplication) -> None:
     src = _make_test_pixmap()
     result = Qlementine.getColorizedPixmap(src, QColor("red"))
     assert isinstance(result, QPixmap)
     assert not result.isNull()
 
 
-def test_get_colorized_pixmap_cached(qapp):
+def test_get_colorized_pixmap_cached(qapp: QApplication) -> None:
     """Calling twice should return equivalent results (cache hit)."""
     src = _make_test_pixmap()
     r1 = Qlementine.getColorizedPixmap(src, QColor("red"))
@@ -135,28 +144,28 @@ def test_get_colorized_pixmap_cached(qapp):
     assert r1.size() == r2.size()
 
 
-def test_get_tinted_pixmap(qapp):
+def test_get_tinted_pixmap(qapp: QApplication) -> None:
     src = _make_test_pixmap()
     result = Qlementine.getTintedPixmap(src, QColor("yellow"))
     assert isinstance(result, QPixmap)
     assert not result.isNull()
 
 
-def test_get_cached_pixmap_colorize(qapp):
+def test_get_cached_pixmap_colorize(qapp: QApplication) -> None:
     src = _make_test_pixmap()
     result = Qlementine.getCachedPixmap(src, QColor("red"), ColorizeMode.Colorize)
     assert isinstance(result, QPixmap)
     assert not result.isNull()
 
 
-def test_get_cached_pixmap_tint(qapp):
+def test_get_cached_pixmap_tint(qapp: QApplication) -> None:
     src = _make_test_pixmap()
     result = Qlementine.getCachedPixmap(src, QColor("red"), ColorizeMode.Tint)
     assert isinstance(result, QPixmap)
     assert not result.isNull()
 
 
-def test_make_pixmap_from_svg(qapp):
+def test_make_pixmap_from_svg(qapp: QApplication) -> None:
     with tempfile.TemporaryDirectory() as d:
         path = _write_svg(d)
         result = Qlementine.makePixmapFromSvg(path, QSize(16, 16))
@@ -165,7 +174,7 @@ def test_make_pixmap_from_svg(qapp):
         assert result.size() == QSize(16, 16)
 
 
-def test_make_pixmap_from_svg_layered(qapp):
+def test_make_pixmap_from_svg_layered(qapp: QApplication) -> None:
     with tempfile.TemporaryDirectory() as d:
         bg = _write_svg(d, "bg.svg")
         fg = _write_svg(d, "fg.svg")
@@ -179,7 +188,7 @@ def test_make_pixmap_from_svg_layered(qapp):
 # ---- QlementineStyle.getColorizedPixmap ----
 
 
-def test_style_get_colorized_pixmap(qapp):
+def test_style_get_colorized_pixmap(qapp: QApplication) -> None:
     style = Qlementine.QlementineStyle()
     src = _make_test_pixmap()
     result = style.getColorizedPixmap(
@@ -188,7 +197,7 @@ def test_style_get_colorized_pixmap(qapp):
     assert isinstance(result, QPixmap)
 
 
-def test_style_get_colorized_pixmap_none(qapp):
+def test_style_get_colorized_pixmap_none(qapp: QApplication) -> None:
     """AutoIconColor.None_ should return the original pixmap unmodified."""
     style = Qlementine.QlementineStyle()
     src = _make_test_pixmap()
@@ -199,7 +208,7 @@ def test_style_get_colorized_pixmap_none(qapp):
     assert result.size() == src.size()
 
 
-def test_style_get_colorized_pixmap_text_color(qapp):
+def test_style_get_colorized_pixmap_text_color(qapp: QApplication) -> None:
     style = Qlementine.QlementineStyle()
     src = _make_test_pixmap()
     result = style.getColorizedPixmap(
@@ -211,7 +220,7 @@ def test_style_get_colorized_pixmap_text_color(qapp):
 # ---- Per-widget autoIconColor ----
 
 
-def test_per_widget_auto_icon_color(qapp):
+def test_per_widget_auto_icon_color(qapp: QApplication) -> None:
     style = Qlementine.QlementineStyle()
     w = QWidget()
     w.setStyle(style)
@@ -219,7 +228,7 @@ def test_per_widget_auto_icon_color(qapp):
     assert style.autoIconColor(w) == AutoIconColor.ForegroundColor
 
 
-def test_per_widget_auto_icon_color_text(qapp):
+def test_per_widget_auto_icon_color_text(qapp: QApplication) -> None:
     style = Qlementine.QlementineStyle()
     w = QWidget()
     w.setStyle(style)
