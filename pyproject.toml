@@ -57,6 +57,7 @@ test-command = [
 [tool.cibuildwheel.macos]
 environment = { MACOSX_DEPLOYMENT_TARGET = "13.0", CC = "/usr/bin/cc", CXX = "/usr/bin/c++" }
 before-build = "uvx --from aqtinstall==3.2.0 aqt install-qt mac desktop $QT_VERSION --outputdir Qt --base http://mirrors.ocf.berkeley.edu/qt/"
+repair-wheel-command = ""
 
 [tool.cibuildwheel.windows]
 before-build = "uvx --from aqtinstall==3.2.0 aqt install-qt windows desktop %QT_VERSION% win64_msvc2022_64 --outputdir Qt --base http://mirrors.ocf.berkeley.edu/qt/"
