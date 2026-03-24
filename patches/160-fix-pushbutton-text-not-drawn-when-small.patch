@@ -1,0 +1,33 @@
+diff --git a/lib/src/style/QlementineStyle.cpp b/lib/src/style/QlementineStyle.cpp
+index 07151b9..d80a1e8 100644
+--- a/lib/src/style/QlementineStyle.cpp
++++ b/lib/src/style/QlementineStyle.cpp
+@@ -1107,8 +1107,7 @@ void QlementineStyle::drawControl(ControlElement ce, const QStyleOption* opt, QP
+         const auto& colorizedPixmap = getColorizedPixmap(pixmap, autoIconColor(w), currentFgColor, currentFgColor);
+         const auto pixmapPixelRatio = colorizedPixmap.devicePixelRatio();
+         const auto iconW = colorizedPixmap.isNull() ? 0 : static_cast<int>(colorizedPixmap.width() / pixmapPixelRatio);
+-        const auto fmFlags = hasMenu ? Qt::AlignLeft : Qt::AlignCenter;
+-        const auto textW = optButton->fontMetrics.boundingRect(optButton->rect, fmFlags, optButton->text).width();
++        const auto textW = qlementine::textWidth(optButton->fontMetrics, optButton->text);
+         const auto iconSpacing = iconW > 0 && !optButton->text.isEmpty() && textW > 0 ? spacing : 0;
+         const auto& fgRect =
+           hasMenu ? optButton->rect.marginsRemoved(QMargins{ 0, 0, indicatorSize + spacing, 0 }) : optButton->rect;
+@@ -1136,7 +1135,7 @@ void QlementineStyle::drawControl(ControlElement ce, const QStyleOption* opt, QP
+         if (availableW > 0 && textW > 0) {
+           const auto elidedText =
+             optButton->fontMetrics.elidedText(optButton->text, Qt::ElideRight, availableW, Qt::TextSingleLine);
+-          const auto elidedTextW = optButton->fontMetrics.boundingRect(optButton->rect, fmFlags, elidedText).width();
++          const auto elidedTextW = qlementine::textWidth(optButton->fontMetrics, elidedText);
+           const auto textRect = QRect{ availableX, contentRect.y(), elidedTextW, contentRect.height() };
+           int textFlags = Qt::AlignVCenter | Qt::AlignBaseline | Qt::TextSingleLine | Qt::TextHideMnemonic;
+           if (iconW == 0) {
+@@ -2381,6 +2380,9 @@ QRect QlementineStyle::subElementRect(SubElement se, const QStyleOption* opt, co
+         const auto hasMenu = optButton->features.testFlag(QStyleOptionButton::HasMenu);
+         const auto padding = pixelMetric(PM_ButtonMargin);
+         const auto [paddingLeft, paddingRight] = getHPaddings(hasIcon, hasText, hasMenu, padding);
++        if (paddingLeft + paddingRight >= opt->rect.width()) {
++          return opt->rect;
++        }
+         return opt->rect.marginsRemoved({ paddingLeft, 0, paddingRight, 0 });
+       }
+       return opt->rect;
