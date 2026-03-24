@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import inspect
+from typing import TYPE_CHECKING
 
 import pytest
-from _qt_compat import Qlementine, QtCore, QTimer, QtWidgets
+from _qt_compat import QtCore, QTimer, QtWidgets
 
-QlementineStyle = Qlementine.QlementineStyle
+if TYPE_CHECKING:
+    from pytestqt.qtbot import QtBot
 
 SKIP = (
     "QAbstract",
@@ -32,20 +34,6 @@ _ALL_WIDGET_CLASSES: list[type[QtWidgets.QWidget]] = sorted(
 
 def _widget_ids() -> list[str]:
     return [c.__name__ for c in _ALL_WIDGET_CLASSES]
-
-
-@pytest.fixture()
-def qlementine_app(qapp: QtWidgets.QApplication):
-    """Apply QlementineStyle to the application for the duration of the test."""
-    style = QlementineStyle(qapp)
-    qapp.setStyle(style)
-    warnings = []
-    QtCore.qInstallMessageHandler(lambda mode, ctx, msg: warnings.append(msg))
-    try:
-        yield qapp
-    finally:
-        QtCore.qInstallMessageHandler(None)
-    assert not warnings, "Qt warnings emitted:\n" + "\n".join(warnings)
 
 
 @pytest.mark.parametrize("cls", _ALL_WIDGET_CLASSES, ids=_widget_ids())
@@ -77,3 +65,31 @@ def test_paint_widget(qlementine_app, qtbot, cls):
     widget.grab()
 
     widget.close()
+
+
+def test_small_button_text_is_visible(
+    qlementine_app: QtWidgets.QApplication,
+    qtbot: QtBot,
+) -> None:
+    """Button text should be drawn even when the button is smaller than sizeHint."""
+    btn_with_text = QtWidgets.QPushButton("1")
+    btn_blank = QtWidgets.QPushButton("")
+    qtbot.addWidget(btn_with_text)
+    qtbot.addWidget(btn_blank)
+
+    small = QtCore.QSize(30, 28)
+    for btn in (btn_with_text, btn_blank):
+        btn.setFixedSize(small)
+        btn.ensurePolished()
+        btn.show()
+
+    qtbot.waitExposed(btn_with_text)
+    qtbot.waitExposed(btn_blank)
+
+    img_text = btn_with_text.grab().toImage()
+    img_blank = btn_blank.grab().toImage()
+
+    assert img_text != img_blank, (
+        "Button with label '1' rendered identically to a blank button "
+        "— text was not drawn."
+    )
