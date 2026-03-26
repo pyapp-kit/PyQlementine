@@ -9,7 +9,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "PySide6-Qlementine"
-version = "1.4.3.0rc2"
+version = "1.4.3.0rc3"
 requires-python = ">=3.10"
 description = "PySide6 bindings for Qlementine, a modern QStyle for desktop Qt6 applications"
 license = "MIT"
