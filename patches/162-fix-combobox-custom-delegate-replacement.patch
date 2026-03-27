@@ -1,0 +1,71 @@
+diff --git a/lib/src/style/QlementineStyle.cpp b/lib/src/style/QlementineStyle.cpp
+index 07151b9..6fb46c1 100644
+--- a/lib/src/style/QlementineStyle.cpp
++++ b/lib/src/style/QlementineStyle.cpp
+@@ -4856,10 +4856,12 @@ void QlementineStyle::polish(QWidget* w) {
+   if (auto* comboBox = qobject_cast<QComboBox*>(w)) {
+     comboBox->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
+ 
+-    // Will define a delegate to stylize the QComboBox items,
+-    comboBox->setItemDelegate(new ComboBoxDelegate(comboBox, *this));
+-    // Trigger the redefine when the QComboBox's view changes.
+-    new ComboboxFilter(comboBox);
++    // Only replace the delegate if the combobox doesn't already have a custom one.
++    // This preserves delegates set by third-party widgets (e.g. custom QStyledItemDelegate subclasses).
++    if (isDefaultItemDelegate(comboBox->itemDelegate())) {
++      comboBox->setItemDelegate(new ComboBoxDelegate(comboBox, *this));
++      new ComboboxFilter(comboBox);
++    }
+   } else if (auto* tabBar = qobject_cast<QTabBar*>(w)) {
+     tabBar->installEventFilter(new TabBarEventFilter(tabBar));
+   } else if (auto* label = qobject_cast<QLabel*>(w)) {
+diff --git a/lib/src/style/eventFilters/ComboboxItemViewFilter.hpp b/lib/src/style/eventFilters/ComboboxItemViewFilter.hpp
+index 77eed32..76bbbd1 100644
+--- a/lib/src/style/eventFilters/ComboboxItemViewFilter.hpp
++++ b/lib/src/style/eventFilters/ComboboxItemViewFilter.hpp
+@@ -7,6 +7,7 @@
+ #include <oclero/qlementine/style/QlementineStyle.hpp>
+ #include <oclero/qlementine/style/Delegates.hpp>
+ 
++#include <QStyledItemDelegate>
+ #include <QEvent>
+ #include <QObject>
+ #include <QComboBox>
+@@ -16,6 +17,15 @@
+ #include <QScreen>
+ 
+ namespace oclero::qlementine {
++
++/// Returns true if the delegate is a default Qt delegate (not a custom subclass).
++inline bool isDefaultItemDelegate(QAbstractItemDelegate* delegate) {
++  if (!delegate) return true;
++  const auto* meta = delegate->metaObject();
++  return meta == &QStyledItemDelegate::staticMetaObject
++      || meta == &QItemDelegate::staticMetaObject;
++}
++
+ // Event filter for the item view in the QComboBox's popup.
+ class ComboboxItemViewFilter : public QObject {
+ public:
+@@ -48,7 +58,9 @@ protected:
+           const auto* child = childEvent->child();
+           if (child == _comboBox->view()) {
+             if (auto* qlementine = qobject_cast<QlementineStyle*>(_comboBox->style())) {
+-              _comboBox->setItemDelegate(new ComboBoxDelegate(_comboBox, *qlementine));
++              if (isDefaultItemDelegate(_comboBox->itemDelegate())) {
++                _comboBox->setItemDelegate(new ComboBoxDelegate(_comboBox, *qlementine));
++              }
+             }
+           }
+         }
+@@ -166,7 +178,9 @@ public:
+         const auto* child = childEvent->child();
+         if (child == _comboBox->view()) {
+           if (auto* qlementine = qobject_cast<QlementineStyle*>(_comboBox->style())) {
+-            _comboBox->setItemDelegate(new ComboBoxDelegate(_comboBox, *qlementine));
++            if (isDefaultItemDelegate(_comboBox->itemDelegate())) {
++              _comboBox->setItemDelegate(new ComboBoxDelegate(_comboBox, *qlementine));
++            }
+           }
+ 
+           // if (const auto* treeView = qobject_cast<QTreeView*>(child)) {
