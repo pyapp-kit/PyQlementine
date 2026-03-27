@@ -5,7 +5,6 @@ from __future__ import annotations
 from _qt_compat import Qlementine, QtWidgets, QWidget
 
 
-
 def test_get_layout_margins(qapp):
     w = QWidget()
     w.setLayout(QtWidgets.QVBoxLayout())

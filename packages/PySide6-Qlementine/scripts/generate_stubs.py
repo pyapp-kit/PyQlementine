@@ -158,9 +158,7 @@ def _split_stubs(content: str) -> tuple[str, str]:
                     dedented = stripped
                     method_block = [dedented]
                     i += 1
-                    while i < len(lines) and lines[i].startswith(
-                        (" ", "\t")
-                    ):
+                    while i < len(lines) and lines[i].startswith((" ", "\t")):
                         # Dedent method body (8 spaces -> 4 spaces)
                         body = lines[i]
                         if body.startswith("        "):
@@ -207,13 +205,11 @@ def _split_stubs(content: str) -> tuple[str, str]:
 def _generate_utils_stubs_from_bridge(header: str) -> str:
     """Generate utils.pyi by introspecting UtilsBridge static method signatures."""
     import inspect
-    import typing
 
     from shibokensupport.signature import get_signature  # type: ignore
 
     bridge = PySide6Qlementine.PySide6Qlementine.UtilsBridge
     lines = [header.rstrip(), ""]
-    seen: dict[str, list[str]] = {}
 
     for name in sorted(dir(bridge)):
         if name.startswith("_") or name == "appStyle":
@@ -308,8 +304,17 @@ def _run_ruff(path: Path) -> None:
     ruff_args = ["--target-version", "py310"]
     subprocess.run(
         [
-            ruff, "check", *ruff_args, "--fix", "--unsafe-fixes",
-            str(path), "--select", "E,F,W,I,UP,RUF", "--ignore", "E501", "--quiet",
+            ruff,
+            "check",
+            *ruff_args,
+            "--fix",
+            "--unsafe-fixes",
+            str(path),
+            "--select",
+            "E,F,W,I,UP,RUF",
+            "--ignore",
+            "E501",
+            "--quiet",
         ],
         check=False,
     )

@@ -5,7 +5,6 @@ from __future__ import annotations
 from _qt_compat import Qlementine, QtWidgets
 
 
-
 def test_get_top_level_menu_returns_self(qapp):
     menu = QtWidgets.QMenu()
     result = Qlementine.utils.getTopLevelMenu(menu)

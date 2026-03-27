@@ -5,7 +5,6 @@ from __future__ import annotations
 from _qt_compat import Qlementine, QWidget
 
 
-
 def test_should_have_hover_events(qapp):
     w = QWidget()
     result = Qlementine.utils.shouldHaveHoverEvents(w)

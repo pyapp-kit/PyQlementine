@@ -14,7 +14,6 @@ ColorRole = Qlementine.ColorRole
 QStyle = QtWidgets.QStyle
 
 
-
 def test_get_mouse_state_from_flags(qapp):
     state = QStyle.StateFlag.State_Enabled | QStyle.StateFlag.State_MouseOver
     result = Qlementine.utils.getMouseState(state)

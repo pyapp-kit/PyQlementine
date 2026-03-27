@@ -5,7 +5,6 @@ from __future__ import annotations
 from _qt_compat import QColor, Qlementine
 
 
-
 def test_get_contrast_ratio():
     # NOTE: upstream getContrastRatio is a stub returning 4.5
     ratio = Qlementine.utils.getContrastRatio(QColor(0, 0, 0), QColor(255, 255, 255))
