@@ -156,8 +156,10 @@
                 <modify-function signature="sizeFromContentsExt(oclero::qlementine::QlementineStyle::ContentsTypeExt,const QStyleOption*,const QSize&amp;,const QWidget*)const"/>
                 <modify-function signature="pixelMetricExt(oclero::qlementine::QlementineStyle::PixelMetricExt,const QStyleOption*,const QWidget*)const"/>
 
-                <!-- Qlementine-specific public method -->
+                <!-- Qlementine-specific public methods -->
                 <modify-function signature="widgetStatus(const QWidget*)const"/>
+                <modify-function signature="setIconStatus(QWidget*,oclero::qlementine::Status)" static="yes"/>
+                <modify-function signature="iconStatus(const QWidget*)const"/>
 
                 <!-- setIconPathGetter: accept a Python callable (or None) and
                      wrap it in a C++ std::function<QString(QString)>.
