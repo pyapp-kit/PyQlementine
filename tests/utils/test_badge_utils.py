@@ -9,7 +9,6 @@ StatusBadgeSize = Qlementine.StatusBadgeSize
 Theme = Qlementine.Theme
 
 
-
 def test_draw_status_badge(qapp):
     pixmap = QtGui.QPixmap(64, 64)
     pixmap.fill(QtGui.QColor(255, 255, 255))

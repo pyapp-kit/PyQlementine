@@ -5,7 +5,6 @@ from __future__ import annotations
 from _qt_compat import Qlementine, QtGui
 
 
-
 def test_point_size_to_pixel_size(qapp):
     result = Qlementine.utils.pointSizeToPixelSize(12.0, 96.0)
     assert isinstance(result, float)

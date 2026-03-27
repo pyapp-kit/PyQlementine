@@ -8,7 +8,6 @@ ColorizeMode = Qlementine.ColorizeMode
 RadiusesF = Qlementine.RadiusesF
 
 
-
 def test_colorize_image(qapp):
     pixmap = QtGui.QPixmap(32, 32)
     pixmap.fill(QColor(128, 128, 128))

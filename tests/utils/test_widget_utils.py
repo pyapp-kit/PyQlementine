@@ -5,7 +5,6 @@ from __future__ import annotations
 from _qt_compat import Qlementine, QWidget
 
 
-
 def test_make_vertical_line(qapp):
     parent = QWidget()
     line = Qlementine.utils.makeVerticalLine(parent)

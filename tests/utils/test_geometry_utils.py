@@ -5,7 +5,6 @@ from __future__ import annotations
 from _qt_compat import Qlementine, QtCore
 
 
-
 def test_point_inside_rounded_rect():
     rect = QtCore.QRectF(0, 0, 100, 100)
     center = QtCore.QPointF(50, 50)

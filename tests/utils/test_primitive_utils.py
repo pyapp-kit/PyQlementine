@@ -10,7 +10,6 @@ RadiusesF = Qlementine.RadiusesF
 Theme = Qlementine.Theme
 
 
-
 def _make_painter():
     """Create a pixmap and painter for drawing tests."""
     pixmap = QtGui.QPixmap(100, 100)

@@ -33,6 +33,7 @@ _UTILS_SIP_FILES = {
     "WidgetUtils.sip",
 }
 
+
 def _find_functions(text: str) -> list[tuple[str, str, str]]:
     """Extract function declarations, handling nested parens in defaults."""
     results: list[tuple[str, str, str]] = []
@@ -65,6 +66,7 @@ def _find_functions(text: str) -> list[tuple[str, str, str]]:
         if m:
             results.append((m.group(1).strip(), m.group(2).strip(), params))
     return results
+
 
 # Matches #include lines inside %TypeHeaderCode blocks
 INCLUDE_RE = re.compile(r"^#include\s+[<\"](.+?)[>\"]", re.MULTILINE)
@@ -170,16 +172,18 @@ def generate_bridge(
     if "oclero/qlementine/style/QlementineStyle.hpp" not in seen:
         lines.append("#include <oclero/qlementine/style/QlementineStyle.hpp>")
 
-    lines.extend([
-        "",
-        "namespace oclero::qlementine {",
-        "",
-        "class UtilsBridge {",
-        "public:",
-        "    static QlementineStyle* appStyle() {",
-        "        return oclero::qlementine::appStyle();",
-        "    }",
-    ])
+    lines.extend(
+        [
+            "",
+            "namespace oclero::qlementine {",
+            "",
+            "class UtilsBridge {",
+            "public:",
+            "    static QlementineStyle* appStyle() {",
+            "        return oclero::qlementine::appStyle();",
+            "    }",
+        ]
+    )
 
     for ret_type, name, params in all_functions:
         call_args = format_call_args(params)
@@ -193,12 +197,14 @@ def generate_bridge(
         lines.append(f"        {body}")
         lines.append("    }")
 
-    lines.extend([
-        "};",
-        "",
-        "} // namespace oclero::qlementine",
-        "",
-    ])
+    lines.extend(
+        [
+            "};",
+            "",
+            "} // namespace oclero::qlementine",
+            "",
+        ]
+    )
 
     return "\n".join(lines)
 

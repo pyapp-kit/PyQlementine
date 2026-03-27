@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import sys
 
+from . import utils as utils
+
 if sys.platform == "win32":
     import os
 
@@ -24,8 +26,10 @@ if sys.platform == "win32":
 
     del PySide6, shiboken6, os, _mod, _dir, _qt_bin
 
+
 def _init():
     import types
+
     from . import PySide6Qlementine as _ql
 
     ns = globals()
@@ -40,7 +44,6 @@ def _init():
     # appStyle lives on UtilsBridge (free functions are rejected by shiboken)
     ns["appStyle"] = _ql.UtilsBridge.appStyle
 
+
 _init()
 del _init
-
-from . import utils as utils

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import pytest
 from _qt_compat import (
     QAction,
     QApplication,
