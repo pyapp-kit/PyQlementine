@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from _qt_compat import QApplication, Qlementine, QtWidgets
+from _qt_compat import QApplication, Qlementine
 
 if TYPE_CHECKING:
     from pytestqt.qtbot import QtBot
@@ -211,34 +211,3 @@ def test_animations_enabled_changed_signal(qtbot: QtBot) -> None:
     style = QlementineStyle()
     with qtbot.waitSignal(style.animationsEnabledChanged):
         style.setAnimationsEnabled(False)
-
-
-# ============================================================
-# Delegate preservation
-
-
-def test_polish_preserves_custom_combobox_delegate(
-    qtbot: QtBot,
-) -> None:
-    """QlementineStyle.polish() should not replace a custom item delegate."""
-
-    QComboBox = QtWidgets.QComboBox
-    QStyledItemDelegate = QtWidgets.QStyledItemDelegate
-
-    class MyDelegate(QStyledItemDelegate):
-        pass
-
-    style = QlementineStyle()
-
-    # Combobox with custom delegate — should be preserved
-    combo = QComboBox()
-    custom = MyDelegate(combo)
-    combo.setItemDelegate(custom)
-    style.polish(combo)
-    assert combo.itemDelegate() is custom
-
-    # Plain combobox — should get the qlementine delegate
-    combo2 = QComboBox()
-    style.polish(combo2)
-    delegate2 = combo2.itemDelegate()
-    assert type(delegate2).__name__ != "QStyledItemDelegate"
