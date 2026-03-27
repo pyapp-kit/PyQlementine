@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import sys
 
-from . import utils as utils
-
 if sys.platform == "win32":
     import os
 
@@ -47,3 +45,5 @@ def _init():
 
 _init()
 del _init
+
+from . import utils as utils  # noqa: E402
