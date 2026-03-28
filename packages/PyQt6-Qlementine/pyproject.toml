@@ -4,7 +4,7 @@ build-backend = "sipbuild.api"
 
 [project]
 name = "PyQt6-Qlementine"
-version = "1.4.3.0rc4"
+version = "1.4.3.0rc5"
 requires-python = ">=3.10"
 description = "Python bindings for Qlementine, a modern QStyle for desktop Qt6 applications"
 license = "GPL-3.0-only"
