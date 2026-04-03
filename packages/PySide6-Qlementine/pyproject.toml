@@ -1,8 +1,8 @@
 [build-system]
 requires = [
     "scikit-build-core>=0.10",
-    "shiboken6-generator>=6.10,<6.11",
-    "PySide6>=6.10,<6.11",
+    "shiboken6-generator==6.10.2",
+    "PySide6==6.10.2",
     "ruff>=0.4",
 ]
 build-backend = "scikit_build_core.build"
@@ -15,7 +15,7 @@ description = "PySide6 bindings for Qlementine, a modern QStyle for desktop Qt6 
 license = "MIT"
 license-files = ["LICENSE"]
 readme = "../../README.md"
-dependencies = ["PySide6>=6.10,<6.11"]
+dependencies = ["PySide6==6.10.2"]
 classifiers = [
 	"Development Status :: 3 - Alpha",
 	"Intended Audience :: Developers",
