@@ -300,8 +300,13 @@ class PyQt6Qlementinemod(PyQtBindings):
         if sys.platform == "win32":
             self.builder_settings.append("QMAKE_CXXFLAGS += /std:c++17 /W0")
         else:
+            # -Wno-implicit-function-declaration works around Qt 6.8.x's
+            # qyieldcpu.h calling __yield() on arm64 without including
+            # <arm_acle.h>; Apple clang 21 trusts __has_builtin(__yield) but
+            # can't resolve the call. No-op under GCC C++ compiles.
             self.builder_settings.append(
-                "QMAKE_CXXFLAGS += -std=c++17 -Wno-error -Wno-overloaded-virtual"
+                "QMAKE_CXXFLAGS += -std=c++17 -Wno-error "
+                "-Wno-overloaded-virtual -Wno-implicit-function-declaration"
             )
 
         super().apply_user_defaults(tool)
