@@ -1,0 +1,161 @@
+diff --git a/lib/include/oclero/qlementine/style/QlementineStyle.hpp b/lib/include/oclero/qlementine/style/QlementineStyle.hpp
+index 9cfd3c6..e8f1d89 100644
+--- a/lib/include/oclero/qlementine/style/QlementineStyle.hpp
++++ b/lib/include/oclero/qlementine/style/QlementineStyle.hpp
+@@ -69,9 +69,16 @@ public:
+   static void setAutoIconColor(QWidget* widget, AutoIconColor autoIconColor);
+   AutoIconColor autoIconColor(const QWidget* widget) const;
+ 
++  static void setIconStatus(QWidget* widget, Status status);
++  Status iconStatus(const QWidget* widget) const;
++
+   QPixmap getColorizedPixmap(
+     const QPixmap& input, AutoIconColor autoIconColor, const QColor& fgcolor, const QColor& textColor) const;
+ 
++  QPixmap getColorizedPixmap(
++    const QPixmap& input, const QWidget* widget, const QColor& fgColor, const QColor& textColor,
++    MouseState mouse = MouseState::Normal) const;
++
+   QIcon makeThemedIcon(
+     const QString& svgPath, const QSize& size = QSize(16, 16), ColorRole role = ColorRole::Secondary) const;
+ 
+diff --git a/lib/src/style/QlementineStyle.cpp b/lib/src/style/QlementineStyle.cpp
+index c0b729e..deedc99 100644
+--- a/lib/src/style/QlementineStyle.cpp
++++ b/lib/src/style/QlementineStyle.cpp
+@@ -80,6 +80,7 @@ constexpr auto iconPenWidth = 1.01;
+ 
+ // Used to determine if the icon must be colorized according to the Theme's colors or not.
+ constexpr auto Property_AutoIconColor = "autoIconColor";
++constexpr auto Property_IconStatus = "iconStatus";
+ 
+ struct QlementineStyleImpl {
+   explicit QlementineStyleImpl(QlementineStyle& o)
+@@ -363,6 +364,37 @@ QPixmap QlementineStyle::getColorizedPixmap(
+   return input;
+ }
+ 
++void QlementineStyle::setIconStatus(QWidget* widget, Status status) {
++  if (widget) {
++    widget->setProperty(Property_IconStatus, QVariant::fromValue(status));
++  }
++}
++
++Status QlementineStyle::iconStatus(const QWidget* widget) const {
++  if (!widget) {
++    return Status::Default;
++  }
++  const auto property = widget->property(Property_IconStatus);
++  if (!property.isValid()) {
++    return iconStatus(widget->parentWidget());
++  }
++  return property.value<Status>();
++}
++
++QPixmap QlementineStyle::getColorizedPixmap(
++  const QPixmap& input, const QWidget* widget, const QColor& fgColor, const QColor& textColor,
++  MouseState mouse) const {
++  const auto aic = autoIconColor(widget);
++  if (aic == AutoIconColor::None) {
++    return input;
++  }
++  if (const auto status = iconStatus(widget); status != Status::Default) {
++    const auto& color = statusColor(status, mouse);
++    return qlementine::getColorizedPixmap(input, color);
++  }
++  return getColorizedPixmap(input, aic, fgColor, textColor);
++}
++
+ QIcon QlementineStyle::makeThemedIcon(const QString& svgPath, const QSize& size, ColorRole role) const {
+   const auto iconTheme = _impl->iconThemeFromTheme(role);
+   return makeIconFromSvg(svgPath, iconTheme, size);
+@@ -1104,7 +1137,7 @@ void QlementineStyle::drawControl(ControlElement ce, const QStyleOption* opt, QP
+         const auto centered = !hasMenu;
+         const auto checked = getCheckState(optButton->state);
+         const auto pixmap = getPixmap(optButton->icon, optButton->iconSize, mouse, checked, w);
+-        const auto& colorizedPixmap = getColorizedPixmap(pixmap, autoIconColor(w), currentFgColor, currentFgColor);
++        const auto& colorizedPixmap = getColorizedPixmap(pixmap, w, currentFgColor, currentFgColor, mouse);
+         const auto pixmapPixelRatio = colorizedPixmap.devicePixelRatio();
+         const auto iconW = colorizedPixmap.isNull() ? 0 : static_cast<int>(colorizedPixmap.width() / pixmapPixelRatio);
+         const auto textW = qlementine::textWidth(optButton->fontMetrics, optButton->text);
+@@ -1187,7 +1220,7 @@ void QlementineStyle::drawControl(ControlElement ce, const QStyleOption* opt, QP
+         const auto spacing = _impl->theme.spacing;
+         const auto checked = getCheckState(optButton->state);
+         const auto pixmap = getPixmap(optButton->icon, optButton->iconSize, mouse, checked, w);
+-        const auto& colorizedPixmap = getColorizedPixmap(pixmap, autoIconColor(w), fgColor, fgColor);
++        const auto& colorizedPixmap = getColorizedPixmap(pixmap, w, fgColor, fgColor, mouse);
+         const auto pixmapPixelRatio = colorizedPixmap.devicePixelRatio();
+         const auto iconW =
+           colorizedPixmap.isNull() ? 0 : static_cast<int>((qreal) colorizedPixmap.width() / (pixmapPixelRatio));
+@@ -1306,7 +1339,7 @@ void QlementineStyle::drawControl(ControlElement ce, const QStyleOption* opt, QP
+         if (!iconSize.isEmpty()) {
+           const auto checked = selection == SelectionState::Selected ? CheckState::Checked : CheckState::NotChecked;
+           const auto pixmap = getPixmap(icon, iconSize, mouse, checked, w);
+-          const auto& colorizedPixmap = getColorizedPixmap(pixmap, autoIconColor(w), fgColor, textColor);
++          const auto& colorizedPixmap = getColorizedPixmap(pixmap, w, fgColor, textColor, mouse);
+           const auto pixmapPixelRatio = colorizedPixmap.devicePixelRatio();
+           const auto pixmapW = pixmapPixelRatio != 0 ? (int) ((qreal) colorizedPixmap.width() / pixmapPixelRatio) : 0;
+           const auto pixmapH = pixmapPixelRatio != 0 ? (int) ((qreal) colorizedPixmap.height() / pixmapPixelRatio) : 0;
+@@ -1485,7 +1518,7 @@ void QlementineStyle::drawControl(ControlElement ce, const QStyleOption* opt, QP
+               : 0;
+           const auto pixmap = getPixmap(optMenuItem->icon, _impl->theme.iconSize, mouse, checkState, w);
+           if (!pixmap.isNull()) {
+-            const auto& colorizedPixmap = getColorizedPixmap(pixmap, autoIconColor(w), fgColor, fgColor);
++            const auto& colorizedPixmap = getColorizedPixmap(pixmap, w, fgColor, fgColor, mouse);
+             const auto targetPxRatio = colorizedPixmap.devicePixelRatio();
+             const auto pixmapW = targetPxRatio != 0 ? (int) ((qreal) colorizedPixmap.width() / targetPxRatio) : 0;
+             const auto pixmapH = targetPxRatio != 0 ? (int) ((qreal) colorizedPixmap.height() / targetPxRatio) : 0;
+@@ -1678,7 +1711,7 @@ void QlementineStyle::drawControl(ControlElement ce, const QStyleOption* opt, QP
+         // Icon.
+         if (hasIcon) {
+           const auto pixmap = getPixmap(icon, iconSize, mouse, checked, w);
+-          const auto& colorizedPixmap = getColorizedPixmap(pixmap, autoIconColor(w), fgColor, fgColor);
++          const auto& colorizedPixmap = getColorizedPixmap(pixmap, w, fgColor, fgColor, mouse);
+           const auto pixmapPixelRatio = colorizedPixmap.devicePixelRatio();
+           const auto pixmapW = pixmapPixelRatio != 0 ? (int) ((qreal) colorizedPixmap.width() / pixmapPixelRatio) : 0;
+           const auto pixmapH = pixmapPixelRatio != 0 ? (int) ((qreal) colorizedPixmap.height() / pixmapPixelRatio) : 0;
+@@ -1868,12 +1901,11 @@ void QlementineStyle::drawControl(ControlElement ce, const QStyleOption* opt, QP
+           const auto iconRect = QRect(iconX, iconY, iconExtent, iconExtent);
+ 
+           if (!hasArrow || iconRect.right() <= maxLabelX) {
+-            const auto autoIconColor = this->autoIconColor(w);
+-            const auto colorize = autoIconColor != AutoIconColor::None;
++            const auto colorize = this->autoIconColor(w) != AutoIconColor::None;
+             const auto iconMode = (optHeader->state & State_Enabled || colorize) ? QIcon::Normal : QIcon::Disabled;
+             const auto iconPixmap =
+               icon.pixmap({ iconExtent, iconExtent }, qlementine::getWindow(w)->devicePixelRatio(), iconMode);
+-            const auto& colorizedPixmap = colorize ? qlementine::colorizePixmap(iconPixmap, fgColor) : iconPixmap;
++            const auto& colorizedPixmap = getColorizedPixmap(iconPixmap, w, fgColor, fgColor, mouse);
+             p->drawPixmap(iconRect, colorizedPixmap);
+           }
+         }
+@@ -2153,7 +2185,7 @@ void QlementineStyle::drawControl(ControlElement ce, const QStyleOption* opt, QP
+         const auto pixmap =
+           getPixmap(optComboBox->currentIcon, optComboBox->iconSize, mouse, CheckState::NotChecked, w);
+         const auto& colorizedPixmap =
+-          getColorizedPixmap(pixmap, autoIconColor(w), fgColor, fgColor); // No animation for icon?
++          getColorizedPixmap(pixmap, w, fgColor, fgColor, mouse); // No animation for icon?
+         const auto iconW = colorizedPixmap.isNull() ? 0 : colorizedPixmap.width() / colorizedPixmap.devicePixelRatio();
+         const auto iconSpacing = iconW > 0 ? spacing : 0;
+         auto availableW = contentRect.width();
+@@ -2302,7 +2334,10 @@ void QlementineStyle::drawControl(ControlElement ce, const QStyleOption* opt, QP
+             p->drawPixmap(pixmapRect, tintedPixmap);
+             p->setOpacity(backupOpacity);
+           } else {
+-            const auto& colorizedPixmap = getColorizedPixmap(pixmap, autoIconColor, fgColor, textColor);
++            const auto status = iconStatus(w);
++            const auto& colorizedPixmap = (status != Status::Default && autoIconColor != AutoIconColor::None)
++              ? qlementine::getColorizedPixmap(pixmap, statusColor(status, itemMouse))
++              : getColorizedPixmap(pixmap, autoIconColor, fgColor, textColor);
+             auto iconRect = subElementRect(SE_ItemViewItemDecoration, optItem, w);
+             iconRect.moveLeft(pixmapRect.left());
+             p->drawPixmap(iconRect, colorizedPixmap);
+@@ -4972,7 +5007,7 @@ void QlementineStyle::drawPrimitiveExt(
+ 
+           if (!pixmap.isNull() && !iconRect.isEmpty()) {
+             const auto& iconColor = commandButtonIconColor(mouse, role);
+-            const auto& colorizedPixmap = getColorizedPixmap(pixmap, autoIconColor(w), iconColor, iconColor);
++            const auto& colorizedPixmap = getColorizedPixmap(pixmap, w, iconColor, iconColor, mouse);
+ 
+             // The pixmap may be smaller than the requested size, so we center it in the rect by default.
+             const auto pixmapPixelRatio = colorizedPixmap.devicePixelRatio();
