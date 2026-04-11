@@ -70,6 +70,11 @@ public:
         const QSize& size = QSize(16, 16),
         ColorRole role = oclero::qlementine::ColorRole::Secondary) const;
 
+    QIcon makeThemedIconFromData(
+        const QByteArray& svgData,
+        const QSize& size = QSize(16, 16),
+        ColorRole role = oclero::qlementine::ColorRole::Secondary) const;
+
     // Icon path getter: accepts a Python callable (str) -> str, or None.
     void setIconPathGetter(SIP_PYCALLABLE /AllowNone/);
 %MethodCode
