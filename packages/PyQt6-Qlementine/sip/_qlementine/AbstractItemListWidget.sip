@@ -49,36 +49,6 @@ public:
     void setItemEnabled(int index, bool enabled);
     bool isItemEnabled(int index) const;
 
-    // ---- protected helpers (exposed via sip public:) ------------------
-    // These are declared protected: in AbstractItemListWidget.hpp but
-    // are useful from Python for hit-testing, programmatic state control,
-    // and custom drawing. Sip generates a friend shim regardless of the
-    // C++ access modifier; we put them in `public:` here so the
-    // generated Python API matches what callers actually want.
-
-    int itemAtPos(const QPoint& pos) const;
-    bool hitTestItemRect(const QPoint& pos, const QRect& itemRect, int leftPadding, int rightPadding) const;
-    void updateItemsSizeHints();
-    void updateItemRects();
-    const QColor& getCurrentItemIndicatorColor() const;
-    QRect getCurrentItemRect() const;
-    QRect getFocusedItemRect() const;
-    QRect getAnimatedCurrentItemRect() const;
-    void updateCurrentIndexAnimation(bool immediate = false);
-    void updateItemsAnimations();
-    void setFocusedIndex(int index);
-    void setHoveredIndex(int index, bool updateAnims = true);
-    void setPressedIndex(int index, bool updateAnims = true);
-    const QFont& badgeFont() const;
-    const QRect& actualRect() const;
-
-    // ---- color hooks exposed as non-virtual ---------------------------
-    const QColor& getItemFgColor(MouseState mouse, bool selected, const Theme& theme) const;
-    const QColor& getItemBgColor(MouseState mouse, const Theme& theme) const;
-    const QColor& getBgColor(const Theme& theme) const;
-    const QColor& getItemBadgeBgColor(MouseState mouse, bool selected, const Theme& theme) const;
-    const QColor& getItemBadgeFgColor(MouseState mouse, bool selected, const Theme& theme) const;
-
 public slots:
     void moveToNextItem();
     void moveToPreviousItem();
@@ -90,30 +60,23 @@ signals:
     void iconSizeChanged();
     void itemsShouldExpandChanged();
 
+
 protected:
-    // ---- protected virtual style hooks --------------------------------
-    // Customization points concrete subclasses (NavigationBar,
-    // SegmentedControl, …) override in C++ to define spacing, colors, and
-    // drawing for their specific look. Exposed so Python subclasses can
-    // override them — useful for theming experiments and writing custom
-    // bar widgets in pure Python.
+    int itemAtPos(const QPoint& pos) const;
+    void setPressedIndex(int index, bool updateAnims = true);
 
-    virtual QMargins getItemPadding() const;
-    virtual int getItemMinimumHeight() const;
-    virtual int getItemSpacing() const;
-    virtual double getItemRadius() const;
-
-    virtual QMargins getPadding() const;
-    virtual int getSpacing() const;
-    virtual double getRadius() const;
-
-    virtual QMargins getBadgePadding() const;
-
-    virtual void drawBackground(QPainter& p) const;
-    virtual void drawCurrentItemIndicator(QPainter& p) const;
-    virtual bool shouldDrawItemBgForCurrent() const;
-
-    virtual QFont labelFont() const;
+    virtual void mousePressEvent(QMouseEvent* e);
+    virtual void mouseMoveEvent(QMouseEvent* e);
+    virtual void mouseReleaseEvent(QMouseEvent* e);
+    virtual void keyPressEvent(QKeyEvent* e);
+    virtual void keyReleaseEvent(QKeyEvent* e);
+    virtual void enterEvent(QEnterEvent* e);
+    virtual void leaveEvent(QEvent* e);
+    virtual void paintEvent(QPaintEvent* e);
+    virtual void resizeEvent(QResizeEvent* e);
+    virtual void focusInEvent(QFocusEvent* e);
+    virtual void showEvent(QShowEvent* e);
+    virtual void changeEvent(QEvent* e);
 };
 
 };
