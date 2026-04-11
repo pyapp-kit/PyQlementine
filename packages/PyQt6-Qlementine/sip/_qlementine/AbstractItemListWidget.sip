@@ -59,6 +59,24 @@ signals:
     void currentDataChanged();
     void iconSizeChanged();
     void itemsShouldExpandChanged();
+
+
+protected:
+    int itemAtPos(const QPoint& pos) const;
+    void setPressedIndex(int index, bool updateAnims = true);
+
+    virtual void mousePressEvent(QMouseEvent* e);
+    virtual void mouseMoveEvent(QMouseEvent* e);
+    virtual void mouseReleaseEvent(QMouseEvent* e);
+    virtual void keyPressEvent(QKeyEvent* e);
+    virtual void keyReleaseEvent(QKeyEvent* e);
+    virtual void enterEvent(QEnterEvent* e);
+    virtual void leaveEvent(QEvent* e);
+    virtual void paintEvent(QPaintEvent* e);
+    virtual void resizeEvent(QResizeEvent* e);
+    virtual void focusInEvent(QFocusEvent* e);
+    virtual void showEvent(QShowEvent* e);
+    virtual void changeEvent(QEvent* e);
 };
 
 };
