@@ -1,15 +1,15 @@
 diff --git a/lib/src/style/eventFilters/ComboboxItemViewFilter.hpp b/lib/src/style/eventFilters/ComboboxItemViewFilter.hpp
-index 62f628b..abc1234 100644
+index 0c8278b..4e9519f 100644
 --- a/lib/src/style/eventFilters/ComboboxItemViewFilter.hpp
 +++ b/lib/src/style/eventFilters/ComboboxItemViewFilter.hpp
 @@ -114,10 +114,17 @@ private:
            // Height.
            const auto absoluteMinHeight = qlementineStyle->theme().controlHeightLarge * (isTreeView ? 5 : 1);
            const auto screen = view->screen();
--          const auto viewGlobalY = view->mapToGlobal(QPoint(0, 0)).y();  // Don't exceed the screen height when expanding a tree view.
--          const auto absoluteMaxHeight = screen != nullptr ?
--                                             screen->geometry().height() - 128 - viewGlobalY :
--                                             qlementineStyle->theme().controlHeightLarge * 10;
+-          const auto viewGlobalY =
+-            view->mapToGlobal(QPoint(0, 0)).y(); // Don't exceed the screen height when expanding a tree view.
+-          const auto absoluteMaxHeight = screen != nullptr ? screen->geometry().height() - 128 - viewGlobalY
+-                                                           : qlementineStyle->theme().controlHeightLarge * 10;
 +          const auto comboGlobalY = _comboBox->mapToGlobal(QPoint(0, 0)).y();
 +          const auto screenPadding = 128;
 +          int absoluteMaxHeight;
@@ -22,5 +22,5 @@ index 62f628b..abc1234 100644
 +            absoluteMaxHeight = qlementineStyle->theme().controlHeightLarge * 10;
 +          }
            const auto height = std::min(absoluteMaxHeight, std::max(absoluteMinHeight, viewMinimumSizeHint().height()));
-
+ 
            view->setFixedWidth(width);
