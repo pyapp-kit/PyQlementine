@@ -27,7 +27,7 @@ jobs:
     env:
       QT_VERSION: ${{ inputs.qt_version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -43,7 +43,7 @@ jobs:
           done
 
       - name: Build wheels via cibuildwheel
-        uses: pypa/cibuildwheel@v3.4
+        uses: pypa/cibuildwheel@v4.1
         env:
           CIBW_VERBOSE: 1
           CIBW_MANYLINUX_X86_64_IMAGE: ${{ inputs.cibw_manylinux }}
