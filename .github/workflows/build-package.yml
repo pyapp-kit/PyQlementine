@@ -27,11 +27,11 @@ jobs:
     env:
       QT_VERSION: ${{ inputs.qt_version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: "recursive"
           fetch-depth: 0
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v10.2.0
       - uses: ilammy/msvc-dev-cmd@v1
 
       - name: Apply submodule patches
@@ -43,10 +43,13 @@ jobs:
           done
 
       - name: Build wheels via cibuildwheel
-        uses: pypa/cibuildwheel@v3.4
+        uses: pypa/cibuildwheel@v4.3
         env:
           CIBW_VERBOSE: 1
           CIBW_MANYLINUX_X86_64_IMAGE: ${{ inputs.cibw_manylinux }}
+          # shiboken-generated code uses non-abi3 PyMethod_New (PySide6's own wheels
+          # fail abi3audit too), so only audit PyQt6 wheels (cibuildwheel's default).
+          CIBW_AUDIT_COMMAND: ${{ inputs.package != 'PySide6-Qlementine' && 'abi3audit --strict --report {abi3_wheel}' || '' }}
         with:
           package-dir: packages/${{ inputs.package }}
           config-file: pyproject.toml
