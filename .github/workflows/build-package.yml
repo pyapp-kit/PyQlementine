@@ -47,8 +47,10 @@ jobs:
         env:
           CIBW_VERBOSE: 1
           CIBW_MANYLINUX_X86_64_IMAGE: ${{ inputs.cibw_manylinux }}
-          # shiboken-generated code uses non-abi3 PyMethod_New (PySide6's own wheels
-          # fail abi3audit too), so only audit PyQt6 wheels (cibuildwheel's default).
+          # abi3audit false-positives on PySide6 wheels: shiboken provides its own
+          # PyMethod_New (exported by libshiboken) for limited-API builds, and
+          # abi3audit flags it by name. PySide6's own wheels get flagged the same way,
+          # so only PyQt6 wheels get cibuildwheel's default strict audit.
           CIBW_AUDIT_COMMAND: ${{ inputs.package != 'PySide6-Qlementine' && 'abi3audit --strict --report {abi3_wheel}' || '' }}
         with:
           package-dir: packages/${{ inputs.package }}
