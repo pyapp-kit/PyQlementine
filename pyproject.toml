@@ -60,6 +60,8 @@ before-build = "uvx --from aqtinstall==3.2.0 aqt install-qt mac desktop $QT_VERS
 repair-wheel-command = ""
 
 [tool.cibuildwheel.windows]
+# Qt DLLs come from PyQt6/PySide6 at runtime; skip cibuildwheel 4's default delvewheel
+repair-wheel-command = ""
 before-build = "uvx --from aqtinstall==3.2.0 aqt install-qt windows desktop %QT_VERSION% win64_msvc2022_64 --outputdir Qt --base http://mirrors.ocf.berkeley.edu/qt/"
 
 

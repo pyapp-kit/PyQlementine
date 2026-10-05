@@ -54,6 +54,9 @@ public:
     }
 %End
 
+    static Theme makeLight();
+    static Theme makeDark();
+
     QJsonDocument toJson() const;
 
     bool operator==(const Theme& other) const;
@@ -196,6 +199,10 @@ public:
     int tabBarPaddingTop;
     int tabBarTabMaxWidth;
     int tabBarTabMinWidth;
+
+    bool fontSizeWasOverriden;
+    bool fontSizeMonospaceWasOverriden;
+    bool fontSizeS1WasOverriden;
 
     QFont fontRegular;
     QFont fontBold;

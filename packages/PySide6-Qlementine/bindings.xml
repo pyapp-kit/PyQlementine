@@ -32,11 +32,9 @@
     <rejection class="oclero::qlementine::ThemeEditor"/>
     <rejection class="oclero::qlementine::QStyleOptionFocusRoundedRect"/>
     <rejection class="oclero::qlementine::QStyleOptionRoundedButton"/>
-    <rejection class="oclero::qlementine::QStyleOptionSliderF"/>
     <rejection class="oclero::qlementine::QStyleOptionCommandLinkButton"/>
     <rejection class="oclero::qlementine::ComboBoxDelegate"/>
     <rejection class="oclero::qlementine::Action"/>
-    <rejection class="oclero::qlementine::FramelessWindow"/>
 
     <namespace-type name="oclero" visible="false">
         <namespace-type name="qlementine" visible="false">

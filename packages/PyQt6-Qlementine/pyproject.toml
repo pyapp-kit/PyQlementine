@@ -1,16 +1,16 @@
 [build-system]
-requires = ["sip >=6,<7", "PyQt-builder >=1.17,<2", "PyQt6==6.8.1", "ruff"]
+requires = ["sip >=6,<7", "PyQt-builder >=1.17,<2", "PyQt6==6.9.0", "ruff"]
 build-backend = "sipbuild.api"
 
 [project]
 name = "PyQt6-Qlementine"
-version = "1.4.3.0rc7"
+version = "1.5.1.0"
 requires-python = ">=3.10"
 description = "Python bindings for Qlementine, a modern QStyle for desktop Qt6 applications"
 license = "GPL-3.0-only"
 license-files = ["LICENSE"]
 readme = "../../README.md"
-dependencies = ["PyQt6>=6.8.0"]
+dependencies = ["PyQt6>=6.9.0"]
 classifiers = [
 	"Development Status :: 3 - Alpha",
 	"Intended Audience :: Developers",
@@ -29,7 +29,11 @@ Upstream = "https://github.com/oclero/qlementine"
 Homepage = "https://github.com/pyapp-kit/PyQlementine"
 
 [dependency-groups]
-build = ["sip >=6,<7", "PyQt-builder >=1.17,<2", "PyQt6==6.8.1", "PyQt6-Qt6==6.8.2"]
+build = ["sip >=6,<7", "PyQt-builder >=1.17,<2", "PyQt6==6.9.0", "PyQt6-Qt6==6.9.0"]
+
+[tool.sip.project]
+# match the minimum PyQt6-sip required by PyQt6 6.9 (newer sip defaults to its latest ABI)
+abi-version = "13.8"
 
 [tool.sip.builder]
 jobs = 8
@@ -39,6 +43,7 @@ pep484-pyi = true
 sip-file = "_qlementine/PyQt6Qlementine.sip"
 qmake-QT = ["widgets", "svg"]
 include-dirs = [
+	"../../include",
 	"../../qlementine/lib/include",
 	"../../qlementine/lib/src",
 ]
@@ -75,6 +80,7 @@ headers = [
 	"../../qlementine/lib/include/oclero/qlementine/widgets/StatusBadgeWidget.hpp",
 	"../../qlementine/lib/include/oclero/qlementine/widgets/Switch.hpp",
 	# internal header needing moc (has Q_OBJECT)
+	"../../qlementine/lib/src/style/eventFilters/DestructionEventFilter.hpp",
 	"../../qlementine/lib/src/style/eventFilters/WidgetWithFocusFrameEventFilter.hpp",
 ]
 sources = [
@@ -83,6 +89,8 @@ sources = [
 	"../../qlementine/lib/src/resources/ResourceInitialization.cpp",
 	"../../qlementine/lib/src/style/Delegates.cpp",
 	"../../qlementine/lib/src/style/EventFilters.cpp",
+	"../../qlementine/lib/src/style/PolishedWidgetRegistry.cpp",
+	"../../qlementine/lib/src/style/PolishUtils.cpp",
 	"../../qlementine/lib/src/style/QlementineStyle.cpp",
 	"../../qlementine/lib/src/style/Theme.cpp",
 	"../../qlementine/lib/src/style/ThemeManager.cpp",

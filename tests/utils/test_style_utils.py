@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from _qt_compat import Qlementine, QWidget
+from _qt_compat import Qlementine, QtWidgets, QWidget
 
 
 def test_should_have_hover_events(qapp):
@@ -33,6 +33,11 @@ def test_should_have_tab_focus(qapp):
     w = QWidget()
     result = Qlementine.utils.shouldHaveTabFocus(w)
     assert isinstance(result, bool)
+
+
+def test_should_have_no_focus(qapp):
+    assert Qlementine.utils.shouldHaveNoFocus(QtWidgets.QToolButton()) is True
+    assert Qlementine.utils.shouldHaveNoFocus(QWidget()) is False
 
 
 def test_should_not_be_vertically_compressed(qapp):

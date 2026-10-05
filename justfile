@@ -52,19 +52,19 @@ build-wheel target="PyQt6": _clone
     if echo "{{ target }}" | grep -qi pyside; then
         export QT_VERSION=6.10.2
     else
-        export QT_VERSION=6.8.1
+        export QT_VERSION=6.9.0
     fi
     just install-qt $QT_VERSION
     uvx cibuildwheel --config-file pyproject.toml packages/{{ target }}-Qlementine
 
 [windows]
 build-wheel target="PyQt6": _clone
-    $qt_version = if ("{{ target }}" -match "(?i)pyside") { "6.10.2" } else { "6.8.1" }; \
+    $qt_version = if ("{{ target }}" -match "(?i)pyside") { "6.10.2" } else { "6.9.0" }; \
     just install-qt qt_version=$qt_version; \
     uvx cibuildwheel --config-file pyproject.toml packages/{{ target }}-Qlementine
 
 [unix]
-install-qt qt_version="6.8.1":
+install-qt qt_version="6.9.0":
     #!/usr/bin/env sh
     if [ -d "Qt/{{ qt_version }}" ]; then
         echo "Qt {{ qt_version }} already installed"
@@ -73,7 +73,7 @@ install-qt qt_version="6.8.1":
     fi
 
 [windows]
-install-qt qt_version="6.8.1":
+install-qt qt_version="6.9.0":
     if (Test-Path "Qt/{{ qt_version }}") { \
         Write-Host "Qt {{ qt_version }} already installed" \
     } else { \

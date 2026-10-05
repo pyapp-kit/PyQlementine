@@ -12,6 +12,7 @@ bool shouldHaveMouseTracking(const QWidget* w);
 bool shouldHaveBoldFont(const QWidget* w);
 bool shouldHaveExternalFocusFrame(const QWidget* w);
 bool shouldHaveTabFocus(const QWidget* w);
+bool shouldHaveNoFocus(const QWidget* w);
 bool shouldNotBeVerticallyCompressed(const QWidget* w);
 bool shouldNotHaveWheelEvents(const QWidget* w);
 int getTabIndex(const QStyleOptionTab* optTab, const QWidget* parentWidget);

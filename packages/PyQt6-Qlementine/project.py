@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 from base64 import urlsafe_b64encode
+from importlib import metadata
 from pathlib import Path
 
 from pyqtbuild import PyQtBindings, PyQtProject, QmakeBuilder
@@ -262,9 +263,14 @@ class PyQt6Qlementine(PyQtProject):
         qmake_path = "bin/qmake"
         if os.name == "nt":
             qmake_path += ".exe"
+        # Prefer the Qt matching $QT_VERSION (CI) or the PyQt6 build dependency,
+        # since several Qt versions may be installed side by side under Qt/.
+        qt_version = os.getenv("QT_VERSION") or metadata.version("PyQt6")
+        candidates = list((repo_root / "Qt" / qt_version).glob(f"*/{qmake_path}"))
+        candidates += list(repo_root.rglob(qmake_path))
         try:
-            qmake_bin = str(next(repo_root.rglob(qmake_path)).absolute())
-        except StopIteration:
+            qmake_bin = str(candidates[0].absolute())
+        except IndexError:
             raise RuntimeError(
                 "qmake not found.\n"
                 "Please run `uvx --from aqtinstall aqt install-qt ...`"
@@ -300,7 +306,7 @@ class PyQt6Qlementinemod(PyQtBindings):
         if sys.platform == "win32":
             self.builder_settings.append("QMAKE_CXXFLAGS += /std:c++17 /W0")
         else:
-            # -Wno-implicit-function-declaration works around Qt 6.8.x's
+            # -Wno-implicit-function-declaration works around Qt 6.8/6.9's
             # qyieldcpu.h calling __yield() on arm64 without including
             # <arm_acle.h>; Apple clang 21 trusts __has_builtin(__yield) but
             # can't resolve the call. No-op under GCC C++ compiles.

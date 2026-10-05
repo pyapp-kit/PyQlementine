@@ -45,6 +45,8 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Svg)
 set(QLEMENTINE_SRC "${REPO_ROOT}/qlementine/lib")
 set(QLEMENTINE_INCLUDE "${QLEMENTINE_SRC}/include")
 set(QLEMENTINE_PRIVATE_INCLUDE "${QLEMENTINE_SRC}/src")
+# Stand-in for the CMake-generated qlementine_export.h
+set(QLEMENTINE_EXPORT_INCLUDE "${REPO_ROOT}/include")
 
 # Headers with Q_OBJECT (needed for AUTOMOC) - matching PyQt6 header list
 set(QLEMENTINE_HEADERS
@@ -79,7 +81,8 @@ set(QLEMENTINE_HEADERS
     ${QLEMENTINE_INCLUDE}/oclero/qlementine/widgets/SegmentedControl.hpp
     ${QLEMENTINE_INCLUDE}/oclero/qlementine/widgets/StatusBadgeWidget.hpp
     ${QLEMENTINE_INCLUDE}/oclero/qlementine/widgets/Switch.hpp
-    # Internal header with Q_OBJECT
+    # Internal headers with Q_OBJECT
+    ${QLEMENTINE_PRIVATE_INCLUDE}/style/eventFilters/DestructionEventFilter.hpp
     ${QLEMENTINE_PRIVATE_INCLUDE}/style/eventFilters/WidgetWithFocusFrameEventFilter.hpp
 )
 
@@ -90,6 +93,8 @@ qt_add_library(qlementine_static STATIC
     ${QLEMENTINE_SRC}/src/resources/ResourceInitialization.cpp
     ${QLEMENTINE_SRC}/src/style/Delegates.cpp
     ${QLEMENTINE_SRC}/src/style/EventFilters.cpp
+    ${QLEMENTINE_SRC}/src/style/PolishedWidgetRegistry.cpp
+    ${QLEMENTINE_SRC}/src/style/PolishUtils.cpp
     ${QLEMENTINE_SRC}/src/style/QlementineStyle.cpp
     ${QLEMENTINE_SRC}/src/style/Theme.cpp
     ${QLEMENTINE_SRC}/src/style/ThemeManager.cpp
@@ -135,7 +140,7 @@ qt_add_library(qlementine_static STATIC
     ${QLEMENTINE_SRC}/resources/qlementine_font_roboto.qrc
 )
 target_include_directories(qlementine_static
-    PUBLIC ${QLEMENTINE_INCLUDE}
+    PUBLIC ${QLEMENTINE_INCLUDE} ${QLEMENTINE_EXPORT_INCLUDE}
     PRIVATE ${QLEMENTINE_PRIVATE_INCLUDE}
 )
 target_link_libraries(qlementine_static PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Svg)
@@ -198,7 +203,7 @@ shiboken_generator_create_binding(
     TYPESYSTEM_FILE ${CMAKE_CURRENT_SOURCE_DIR}/bindings.xml
     LIBRARY_TARGET qlementine_static
     QT_MODULES Core Gui Widgets Svg
-    SHIBOKEN_EXTRA_OPTIONS -I${QLEMENTINE_INCLUDE} ${SHIBOKEN_EXTRA}
+    SHIBOKEN_EXTRA_OPTIONS -I${QLEMENTINE_INCLUDE} -I${QLEMENTINE_EXPORT_INCLUDE} ${SHIBOKEN_EXTRA}
     FORCE_LIMITED_API
 )
 
