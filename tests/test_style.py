@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from _qt_compat import QApplication, Qlementine
+from _qt_compat import QApplication, Qlementine, QtWidgets
 
 if TYPE_CHECKING:
     from pytestqt.qtbot import QtBot
@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 QlementineStyle = Qlementine.QlementineStyle
 Theme = Qlementine.Theme
 AutoIconColor = Qlementine.AutoIconColor
+Status = Qlementine.Status
 
 
 def test_create_style(qapp: QApplication) -> None:
@@ -42,6 +43,20 @@ def test_set_auto_icon_color(qapp: QApplication) -> None:
 
     style.setAutoIconColor(AutoIconColor.TextColor)
     assert style.autoIconColor() == AutoIconColor.TextColor
+
+
+def test_widget_auto_icon_color(qapp: QApplication) -> None:
+    w = QtWidgets.QWidget()
+    QlementineStyle.setAutoIconColor(w, AutoIconColor.TextColor)
+    assert QlementineStyle.autoIconColor(w) == AutoIconColor.TextColor
+
+
+def test_set_widget_status(qapp: QApplication) -> None:
+    style = QlementineStyle()
+    w = QtWidgets.QLineEdit()
+    assert style.widgetStatus(w) == Status.Default
+    QlementineStyle.setWidgetStatus(w, Status.Error)
+    assert style.widgetStatus(w) == Status.Error
 
 
 def test_theme_returns_theme_object(qapp: QApplication) -> None:

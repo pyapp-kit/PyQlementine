@@ -133,6 +133,11 @@ def test_theme_from_json_path_dark(qapp: QApplication) -> None:
     assert t.backgroundColorMain1 == QColor("#1f2127")
 
 
+def test_theme_make_light_dark(qapp: QApplication) -> None:
+    assert Theme.makeLight().meta.name == "Light"
+    assert Theme.makeDark().meta.name == "Dark"
+
+
 def test_theme_from_json_path_nonexistent(qapp: QApplication) -> None:
     with pytest.raises(ValueError, match="Failed to load theme"):
         Theme.fromJsonPath("/nonexistent/path.json")

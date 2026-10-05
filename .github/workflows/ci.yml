@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/build-package.yml
     with:
       package: PyQt6-Qlementine
-      qt_version: "6.8.1"
+      qt_version: "6.9.0"
 
   pyside6-qlementine:
     uses: ./.github/workflows/build-package.yml

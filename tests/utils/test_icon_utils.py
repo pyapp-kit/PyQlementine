@@ -109,9 +109,7 @@ def test_make_themed_icon_from_data_with_size(qapp):
 def test_make_themed_icon_from_data_with_role(qapp):
     """Both Primary and Secondary roles produce valid (non-null) icons."""
     style = QlementineStyle()
-    primary = style.makeThemedIconFromData(
-        SVG_BYTES, QSize(16, 16), ColorRole.Primary
-    )
+    primary = style.makeThemedIconFromData(SVG_BYTES, QSize(16, 16), ColorRole.Primary)
     secondary = style.makeThemedIconFromData(
         SVG_BYTES, QSize(16, 16), ColorRole.Secondary
     )
