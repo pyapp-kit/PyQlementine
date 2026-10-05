@@ -1,5 +1,5 @@
 diff --git a/lib/src/style/eventFilters/WidgetWithFocusFrameEventFilter.hpp b/lib/src/style/eventFilters/WidgetWithFocusFrameEventFilter.hpp
-index 1722b4c..1582739 100644
+index 4fd2c1c..5359b9e 100644
 --- a/lib/src/style/eventFilters/WidgetWithFocusFrameEventFilter.hpp
 +++ b/lib/src/style/eventFilters/WidgetWithFocusFrameEventFilter.hpp
 @@ -5,6 +5,7 @@
@@ -10,44 +10,82 @@ index 1722b4c..1582739 100644
  #include <QTimer>
  #include <QEvent>
  
-@@ -28,13 +29,27 @@ public:
-       if (type == QEvent::Paint && !_added) {
-         QTimer::singleShot(0, this, [this]() {
+@@ -22,21 +23,36 @@ public:
+ 
+   bool eventFilter(QObject* watchedObject, QEvent* evt) override {
+     if (watchedObject == _widget) {
+-      const auto type = evt->type();
+-      // Create the focus frame as late as possible to give
+-      // more chances to any parent (e.g. scrollarea) to already exist.
+-      // QEvent::Show isn't sufficient. We need to delay even more, so
+-      // waiting for the first QEvent::Paint is our only solution.
+-      if (type == QEvent::Paint && !_added) {
+-        QTimer::singleShot(0, this, [this]() {
++      switch (evt->type()) {
++        case QEvent::Paint:
++          // Create the focus frame as late as possible to give
++          // more chances to any parent (e.g. scrollarea) to already exist.
++          // QEvent::Show isn't sufficient. We need to delay even more, so
++          // waiting for the first QEvent::Paint is our only solution.
            if (!_added) {
 -            _added = true;
 -            _focusFrame->setWidget(_widget);
-+            if (_widget && _focusFrame) {
-+              _added = true;
-+              _focusFrame->setWidget(_widget);
-+            }
++            QTimer::singleShot(0, this, [this]() {
++              attachFocusFrame();
++            });
            }
-         });
-       } else if (type == QEvent::Show && _added) {
+-        });
+-      } else if (type == QEvent::Show && _added) {
 -        _focusFrame->setWidget(nullptr);
 -        _focusFrame->setWidget(_widget);
-+        // Defer to avoid mapTo() on a partially-connected hierarchy
-+        // after reparenting (same pattern as the Paint path above).
-+        QTimer::singleShot(0, this, [this]() {
-+          if (_widget && _focusFrame) {
-+            _focusFrame->setWidget(nullptr);
-+            _focusFrame->setWidget(_widget);
++          break;
++        case QEvent::Show:
++          // Defer to avoid mapTo() on a partially-connected hierarchy
++          // after reparenting (same pattern as the Paint path above).
++          if (_added) {
++            QTimer::singleShot(0, this, [this]() {
++              reattachFocusFrame();
++            });
 +          }
-+        });
-+      } else if (type == QEvent::Hide && _added) {
-+        // Disconnect the focus frame when the widget is hidden (e.g.
-+        // during reparenting) to prevent stale mapTo() calls.
-+        if (_focusFrame) {
-+          _focusFrame->setWidget(nullptr);
-+        }
++          break;
++        case QEvent::Hide:
++          // Disconnect the focus frame when the widget is hidden (e.g.
++          // during reparenting) to prevent stale mapTo() calls.
++          if (_added) {
++            detachFocusFrame();
++          }
++          break;
++        default:
++          break;
        }
      }
  
-@@ -42,8 +57,8 @@ public:
+@@ -44,8 +60,28 @@ public:
    }
  
  private:
 -  QWidget* _widget{ nullptr };
 -  QFocusFrame* _focusFrame{ nullptr };
++  void attachFocusFrame() {
++    if (!_added && _widget && _focusFrame) {
++      _added = true;
++      _focusFrame->setWidget(_widget);
++    }
++  }
++
++  void reattachFocusFrame() {
++    if (_widget && _focusFrame) {
++      _focusFrame->setWidget(nullptr);
++      _focusFrame->setWidget(_widget);
++    }
++  }
++
++  void detachFocusFrame() {
++    if (_focusFrame) {
++      _focusFrame->setWidget(nullptr);
++    }
++  }
++
 +  QPointer<QWidget> _widget;
 +  QPointer<QFocusFrame> _focusFrame;
    bool _added{ false };
